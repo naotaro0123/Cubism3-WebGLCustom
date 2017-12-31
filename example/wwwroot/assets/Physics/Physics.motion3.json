@@ -1,0 +1,61 @@
+{
+	"Version": 3,
+	"Meta": {
+		"Duration": 3.333,
+		"Fps": 30.0,
+		"Loop": true,
+		"AreBeziersRestricted": true,
+		"CurveCount": 2,
+		"TotalSegmentCount": 5,
+		"TotalPointCount": 15
+	},
+	"Curves": [
+		{
+			"Target": "Model",
+			"Id": "Opacity",
+			"Segments": [
+				0,
+				1,
+				0,
+				3.333,
+				1
+			]
+		},
+		{
+			"Target": "Parameter",
+			"Id": "ParamPositionX",
+			"Segments": [
+				0,
+				-50,
+				1,
+				0.278,
+				-50,
+				0.556,
+				50,
+				0.833,
+				50,
+				1,
+				1.111,
+				50,
+				1.389,
+				-50,
+				1.667,
+				-50,
+				1,
+				1.944,
+				-50,
+				2.222,
+				50,
+				2.5,
+				50,
+				1,
+				2.778,
+				50,
+				3.056,
+				-50,
+				3.333,
+				-50
+			]
+		}
+	]
+}

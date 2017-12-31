@@ -1,0 +1,28 @@
+{
+    "Version": 3,
+    "FileReferences": {
+        "Moc": "unitychan.moc3",
+        "Textures": [
+            "unitychan.2048/texture_00.png"
+        ],
+        "Motions": [
+            "motions/idle_01.motion3.json",
+            "motions/idle_02.motion3.json",
+            "motions/m_01.motion3.json",
+            "motions/m_02.motion3.json",
+            "motions/m_03.motion3.json",
+            "motions/m_04.motion3.json",
+            "motions/m_05.motion3.json",
+            "motions/m_06.motion3.json",
+            "motions/m_07.motion3.json",
+            "motions/m_08.motion3.json",
+            "motions/m_09.motion3.json",
+            "motions/m_10.motion3.json",
+            "motions/m_11.motion3.json",
+            "motions/m_12.motion3.json",
+            "motions/m_13.motion3.json",
+            "motions/m_14.motion3.json"
+        ],
+        "Physics": "Physics.physics3.json"
+    }
+}

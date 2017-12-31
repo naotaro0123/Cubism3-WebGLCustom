@@ -1,0 +1,43 @@
+/* Minimal Stylesheet */
+
+
+/* Color Palette
+–––––––––––––––––––––––––––––––––––––––––––––––––– *//*
+primary:     #FFFFFF
+primary-mid: #C8CACC
+secondary:   #263238
+
+live-2d:     #00A9E0
+cubism:      #FF6E2D
+euclid:      #00B2B3
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+
+/* Main Section Style
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+.main {
+    background-color: #263238;
+    font-size: 0.5em;
+    text-align: center;
+    color: #FFFFFF;
+}
+.main a {
+    color: #FFFFFF;
+}
+
+
+/* Responsive Design
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+/* Bigger than 750 */
+@media (min-width: 750px) {
+    .main {
+        font-size: 0.8em;
+    }
+}
+
+/* Bigger than 1000 */
+@media (min-width: 1000px) {
+    .main {
+        font-size: 1.0em;
+    }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "live2dcubismcomponents",
+  "version": "0.0.1",
+  "description": "Live2D Cubism JS Components",
+  "dependencies": {
+    "pixi.js": "^4.5.2"
+  },
+  "scripts": {
+    "build": "tsc -p ./src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Live2D/CubismJsComponents.git"
+  },
+  "author": "Live2D Inc.",
+  "license": "SEE LICENSE IN http://live2d.com/eula/live2d-open-software-license-agreement_en.html.",
+  "devDependencies": {
+    "@types/pixi.js": "^4.5.2"
+  }
+}

@@ -1,0 +1,13 @@
+{
+    "Version": 3,
+    "FileReferences": {
+        "Moc": "koharu.moc3",
+        "Textures": [
+            "koharu.2048/texture_00.png"
+        ],
+        "Motions": [
+            "motions/koharu.motion3.json"
+        ],
+        "Physics": "Physics.physics3.json"
+    }
+}
