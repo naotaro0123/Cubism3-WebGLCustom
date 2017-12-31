@@ -3,6 +3,9 @@ var ts = require("gulp-typescript");
 var flatten = require('gulp-flatten');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
+var runSequence = require('run-sequence');
+var del = require('del');
+
 
 gulp.task('build-tsc', function() {
     var tsProject = ts.createProject('./src/tsc/tsconfig.json');
@@ -20,27 +23,33 @@ gulp.task('copy-src', function() {
         .pipe(gulp.dest('./wwwroot'));
 });
 
-gulp.task('build-ts', function() {
+gulp.task('copy-assets', function() {
+    return gulp.src('./assets/**/*.*')
+        .pipe(gulp.dest('./wwwroot/assets'));
+});
+
+gulp.task('browserify', function() {
     return browserify({
-            entries: ['./wwwroot/js/Define.js', './wwwroot/js/Live2DInit.js']
+            entries: ['./wwwroot/js/Define.js', './wwwroot/js/Live2DInit.js', './wwwroot/js/Live2DModel.js']
         }).plugin('tsify')
         .bundle()
         .pipe(source('app.js'))
         .pipe(gulp.dest('./wwwroot/js'));
 });
 
-gulp.task('copy-assets', function() {
-    return gulp.src('./assets/**/*.*')
-        .pipe(gulp.dest('./wwwroot/assets'));
+gulp.task('clean', function() {
+    del(['./wwwroot/js/Define.js', './wwwroot/js/Live2DInit.js', './wwwroot/js/Live2DModel.js']);
 });
 
-
-gulp.task('default', [
-    'build-tsc',
-    'copy-src',
-    'copy-assets',
-    'build-ts'
-]);
+gulp.task('default', function() {
+    runSequence(
+        'build-tsc',
+        'copy-src',
+        'copy-assets',
+        'browserify',
+        'clean'
+    )
+});
 
 gulp.task('watch', function() {
     gulp.watch('./src/tsc/*.ts', ['default']);

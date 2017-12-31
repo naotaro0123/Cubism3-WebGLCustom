@@ -41,14 +41,14 @@ export namespace PIXI_LIVE2D {
         }
 
         loadMoc(){
-            PIXI.loader.add(`Moc_${this._app.view.id}`, this._modelDefine._filepath + this._modelInfo.Moc,
+            PIXI.loader.add(`Moc_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Moc,
                 { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER });
         }
 
         loadTextures(){
             for(var i = 0; i < this._modelInfo.Textures.length; i++)
             {
-                PIXI.loader.add(`Texture${i}_${this._app.view.id}`, this._modelDefine._filepath + this._modelInfo.Textures[i]);
+                PIXI.loader.add(`Texture${i}_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Textures[i]);
             }
         }
 
@@ -56,7 +56,7 @@ export namespace PIXI_LIVE2D {
             if(this._modelInfo.Motions !== void 0){
                 for(var i = 0; i < this._modelInfo.Motions.length; i++)
                 {
-                    PIXI.loader.add(`Motion${i}_${this._app.view.id}`, this._modelDefine._filepath + this._modelInfo.Motions[i],
+                    PIXI.loader.add(`Motion${i}_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Motions[i],
                                     { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
                 }
             }
@@ -64,28 +64,28 @@ export namespace PIXI_LIVE2D {
 
         loadPhysics(){
             if(this._modelInfo.Physics !== void 0){
-                PIXI.loader.add(`Physics_${this._app.view.id}`, this._modelDefine._filepath + this._modelInfo.Physics,
+                PIXI.loader.add(`Physics_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Physics,
                 { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
             }
         }
 
         loadResources(_resources: PIXI.loaders.ResourceDictionary){
             // Load moc.
-            this._moc = LIVE2DCUBISMCORE.Moc.fromArrayBuffer(_resources[`Moc_${this._app.view.id}`].data);
+            this._moc = LIVE2DCUBISMCORE.Moc.fromArrayBuffer(_resources[`Moc_${this._canvasDefine._id}`].data);
             this._modelbuilder = new LIVE2DCUBISMPIXI.ModelBuilder();
             this._modelbuilder.setMoc(this._moc)
                                 .setTimeScale(1);
             // Texture
             for(var i =0; i < this._modelInfo.Textures.length; i++)
             {
-                this._modelbuilder.addTexture(i, _resources[`Texture${i}_${this._app.view.id}`].texture);
+                this._modelbuilder.addTexture(i, _resources[`Texture${i}_${this._canvasDefine._id}`].texture);
             }
             // Motion
-            this._modelbuilder.addAnimatorLayer(`Base_${this._app.view.id}`,
+            this._modelbuilder.addAnimatorLayer(`Base_${this._canvasDefine._id}`,
                 LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
             // PhySics
-            if(_resources[`Physics_${this._app.view.id}`] !== void 0){
-                this._modelbuilder.setPhysics3Json(_resources[`Physics_${this._app.view.id}`].data);
+            if(_resources[`Physics_${this._canvasDefine._id}`] !== void 0){
+                this._modelbuilder.setPhysics3Json(_resources[`Physics_${this._canvasDefine._id}`].data);
             }
             this._model = this._modelbuilder.build();
             // Add model to stage.
@@ -101,22 +101,22 @@ export namespace PIXI_LIVE2D {
                 for(var i = 0; i < this._modelInfo.Motions.length; i++)
                 {
                     this._animations[i] =
-                        LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(_resources[`Motion${i}_${this._app.view.id}`].data);
+                        LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(_resources[`Motion${i}_${this._canvasDefine._id}`].data);
                 }
             }
         }
 
         playAnimation(i: number){
             // Play animation.
-            this._model.animator.getLayer(`Base_${this._app.view.id}`).play(this._animations[i]);
+            this._model.animator.getLayer(`Base_${this._canvasDefine._id}`).play(this._animations[i]);
         }
 
         stopAnimation(){
-            this._model.animator.getLayer(`Base_${this._app.view.id}`).stop();
+            this._model.animator.getLayer(`Base_${this._canvasDefine._id}`).stop();
         }
 
         setLoop(loop : boolean){
-            this._model.animator.getLayer(`Base_${this._app.view.id}`).currentAnimation.loop = loop;
+            this._model.animator.getLayer(`Base_${this._canvasDefine._id}`).currentAnimation.loop = loop;
         }
 
         tick(){
@@ -124,7 +124,11 @@ export namespace PIXI_LIVE2D {
             this._app.ticker.add((deltaTime) => {
                 this._model.update(deltaTime);
                 this._model.masks.update(this._app.renderer);
+                // console.log("tick");
             });
+        }
+        changeColor(r: any, g: any, b: any){
+
         }
 
         setTickSpeed(speed: number = 1){

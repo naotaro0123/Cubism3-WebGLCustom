@@ -12,10 +12,12 @@
         "@types/pixi.js": "^4.6.2",
         "browserify": "^14.5.0",
         "gulp": "^3.9.1",
-        "typescript": "^2.4.2",
-        "gulp-typescript": "^3.2.3",
         "gulp-flatten": "^0.4.0",
+        "gulp-typescript": "^3.2.3",
+        "run-sequence": "^2.2.0",
+        "tsify": "^3.0.4",
+        "typescript": "^2.4.2",
         "vinyl-source-stream": "^2.0.0",
-        "tsify": "^3.0.4"
+        "del": "^3.0.0"
     }
 }
