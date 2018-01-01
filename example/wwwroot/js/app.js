@@ -22,16 +22,13 @@ var LIVE2DDEFINE;
             this._height = 400;
             this._x = 200;
             this._y = 300;
-            this._scaleX = 400;
-            this._scaleY = 400;
-            this._bgcolor = 0x1099bb;
+            this._scale = 400;
         }
         return CANVAS;
     }());
     LIVE2DDEFINE.CANVAS = CANVAS;
     LIVE2DDEFINE.MODELS_DEFINE = {};
     LIVE2DDEFINE.MODELS_NAME = [
-        "haru", 'koharu', 'unitychan',
         "haru", 'koharu', 'unitychan'
     ];
     function modelset(i, name) {
@@ -57,7 +54,7 @@ var LIVE2DDEFINE;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Define_1 = require("./Define");
-var Live2DModel_1 = require("./Live2DModel");
+var Live2DPixiModel_1 = require("./Live2DPixiModel");
 document.addEventListener("DOMContentLoaded", function () {
     var modelId = [];
     var modelDef = [];
@@ -70,25 +67,34 @@ document.addEventListener("DOMContentLoaded", function () {
         if (i === void 0) { i = 0; }
         modelId[i] = Define_1.LIVE2DDEFINE.MODELS_NAME[i];
         modelDef[i] = Define_1.LIVE2DDEFINE.MODELS_DEFINE[modelId[i]];
-        app = new PIXI.Application(modelDef[i].Canvas._width, modelDef[i].Canvas._height, { backgroundColor: modelDef[i].Canvas._bgcolor });
+        app = new PIXI.Application(modelDef[i].Canvas._width, modelDef[i].Canvas._height, { transparent: true });
         app.view.id = modelDef[i].Canvas._id;
         PIXI.loader.add("ModelJson_" + modelDef[i].Canvas._id, modelDef[i].Model._filepath + modelDef[i].Model._modeljson, { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
         PIXI.loader.load(function (loader, resources) {
             modelInfo = resources["ModelJson_" + modelDef[i].Canvas._id].data.FileReferences;
-            Live2Dcanvas[i] = new Live2DModel_1.PIXI_LIVE2D.Live2DPixiModel(app, loader, modelInfo, modelId[i], modelDef[i].Canvas, modelDef[i].Model);
+            Live2Dcanvas[i] = new Live2DPixiModel_1.PIXI_LIVE2D.Live2DPixiModel(app, loader, modelInfo, modelId[i], modelDef[i].Canvas, modelDef[i].Model);
             document.body.appendChild(app.view);
         });
     }
-    var cnt = 0;
+    var animCnt = 0;
     document.getElementById("changeMotion").addEventListener("click", function () {
-        cnt++;
-        if (cnt >= modelInfo.Motions.length) {
-            cnt = 0;
+        animCnt++;
+        if (animCnt >= modelInfo.Motions.length) {
+            animCnt = 0;
         }
-        Live2Dcanvas[Live2Dglno].playAnimation(cnt);
-        document.getElementById("motionNm").innerText = "motion" + cnt + " playing";
+        changeLoop.innerHTML = "ループON";
+        Live2Dcanvas[Live2Dglno].playAnimation(animCnt);
+        document.getElementById("motionNm").innerText =
+            ("" + modelInfo.Motions[animCnt]).replace("motions/", "").replace(".motion3.json", "");
     }, false);
-    document.getElementById("changeLoop").addEventListener("click", function () {
+    var changeLoop = document.getElementById("changeLoop");
+    changeLoop.addEventListener("click", function () {
+        if (changeLoop.innerHTML == "ループON") {
+            changeLoop.innerHTML = "ループOFF";
+        }
+        else {
+            changeLoop.innerHTML = "ループON";
+        }
         Live2Dcanvas[Live2Dglno].setLoop(false);
     }, false);
     document.getElementById("deletebtn").addEventListener("click", function () {
@@ -101,17 +107,52 @@ document.addEventListener("DOMContentLoaded", function () {
         Live2Dglno++;
         init(Live2Dglno);
     });
-    document.getElementById("changeColor").addEventListener("click", function () {
+    var opacitySlider = document.getElementById("opacitySlider");
+    opacitySlider.addEventListener("input", function () {
+        Live2Dcanvas[Live2Dglno].changeOpacity(opacitySlider.value);
     });
+    var positionXSlider = document.getElementById("positionXSlider");
+    positionXSlider.addEventListener("input", function () {
+        Live2Dcanvas[Live2Dglno].rePosition(positionXSlider.value, positionYSlider.value, scaleSlider.value);
+    });
+    var positionYSlider = document.getElementById("positionYSlider");
+    positionYSlider.addEventListener("input", function () {
+        Live2Dcanvas[Live2Dglno].rePosition(positionXSlider.value, positionYSlider.value, scaleSlider.value);
+    });
+    var scaleSlider = document.getElementById("scaleSlider");
+    scaleSlider.addEventListener("input", function () {
+        Live2Dcanvas[Live2Dglno].rePosition(positionXSlider.value, positionYSlider.value, scaleSlider.value);
+    });
+    var speedSlider = document.getElementById("speedSlider");
+    speedSlider.addEventListener("input", function () {
+        Live2Dcanvas[Live2Dglno].setTickSpeed(speedSlider.value);
+    });
+    var blendCnt = 1;
+    var changeBlend = document.getElementById("changeBlend");
+    changeBlend.addEventListener("click", function () {
+        if (changeBlend.innerHTML == "ブレンドOVERRIDE") {
+            changeBlend.innerHTML = "ブレンドADD";
+        }
+        else {
+            changeBlend.innerHTML = "ブレンドOVERRIDE";
+        }
+        blendCnt++;
+        Live2Dcanvas[Live2Dglno].changeBlend(blendCnt);
+    }, false);
 });
 
-},{"./Define":1,"./Live2DModel":3}],3:[function(require,module,exports){
+},{"./Define":1,"./Live2DPixiModel":3}],3:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var PIXI_LIVE2D;
 (function (PIXI_LIVE2D) {
     var Live2DPixiModel = (function () {
         function Live2DPixiModel(app, loader, modelInfo, modelId, canvasDefine, modelDefine) {
+            this._mouse_x = 0;
+            this._mouse_y = 0;
+            this._pos_x = 0;
+            this._pos_y = 0;
+            this._dragging = false;
             this._app = app;
             this._loader = loader;
             this._modelInfo = modelInfo;
@@ -130,10 +171,40 @@ var PIXI_LIVE2D;
                 _this.loadResources(resources);
                 _this.loadAnimations(resources);
                 _this.playAnimation(0);
+                _this.rePosition();
+                _this.onDragEvent();
                 _this.resize();
                 window.onresize = _this.resize;
                 _this.tick();
             });
+        };
+        Live2DPixiModel.prototype.onDragEvent = function () {
+            this._parameterIndexAngleX = this._model.parameters.ids.indexOf("PARAM_ANGLE_X");
+            this._parameterIndexAngleY = this._model.parameters.ids.indexOf("PARAM_ANGLE_Y");
+            this._parameterIndexBodyAngleX = this._model.parameters.ids.indexOf("PARAM_BODY_ANGLE_X");
+            this._parameterIndexEyeX = this._model.parameters.ids.indexOf("PARAM_EYE_BALL_X");
+            this._parameterIndexEyeY = this._model.parameters.ids.indexOf("PARAM_EYE_BALL_Y");
+            this._app.view.addEventListener('pointerdown', this._onDragStart.bind(this), false);
+            this._app.view.addEventListener('pointerup', this._onDragEnd.bind(this), false);
+            this._app.view.addEventListener('pointerout', this._onDragEnd.bind(this), false);
+            this._app.view.addEventListener('pointermove', this._onDragMove.bind(this), false);
+        };
+        Live2DPixiModel.prototype._onDragStart = function (event) {
+            this._dragging = true;
+        };
+        Live2DPixiModel.prototype._onDragEnd = function (event) {
+            this._dragging = false;
+            this._pos_x = 0.0;
+            this._pos_y = 0.0;
+        };
+        Live2DPixiModel.prototype._onDragMove = function (event) {
+            this._mouse_x = this._model.position.x - event.offsetX;
+            this._mouse_y = this._model.position.y - event.offsetY;
+            var height = this._app.screen.height / 2;
+            var width = this._app.screen.width / 2;
+            var scale = 1.0 - (height / this._canvasDefine._scale);
+            this._pos_x = -this._mouse_x / height;
+            this._pos_y = -(this._mouse_y / width) + scale;
         };
         Live2DPixiModel.prototype.loadMoc = function () {
             PIXI.loader.add("Moc_" + this._canvasDefine._id, this._modelDefine._filepath + this._modelInfo.Moc, { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER });
@@ -192,11 +263,32 @@ var PIXI_LIVE2D;
         Live2DPixiModel.prototype.tick = function () {
             var _this = this;
             this._app.ticker.add(function (deltaTime) {
+                _this.resize();
+                _this.rePosition();
+                _this._updateParameter();
                 _this._model.update(deltaTime);
                 _this._model.masks.update(_this._app.renderer);
             });
         };
-        Live2DPixiModel.prototype.changeColor = function (r, g, b) {
+        Live2DPixiModel.prototype._updateParameter = function () {
+            this._model.parameters.values[this._parameterIndexAngleX] = this._pos_x * 30;
+            this._model.parameters.values[this._parameterIndexAngleY] = -this._pos_y * 30;
+            this._model.parameters.values[this._parameterIndexBodyAngleX] = this._pos_x * 10;
+            this._model.parameters.values[this._parameterIndexEyeX] = this._pos_x;
+            this._model.parameters.values[this._parameterIndexEyeY] = -this._pos_y;
+        };
+        Live2DPixiModel.prototype.changeBlend = function (i) {
+            if (i % 2 == 0) {
+                this._model.animator.getLayer("Base_" + this._canvasDefine._id).blend =
+                    LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.ADD;
+            }
+            else {
+                this._model.animator.getLayer("Base_" + this._canvasDefine._id).blend =
+                    LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE;
+            }
+        };
+        Live2DPixiModel.prototype.changeOpacity = function (opacity) {
+            this._app.view.style.opacity = opacity;
         };
         Live2DPixiModel.prototype.setTickSpeed = function (speed) {
             if (speed === void 0) { speed = 1; }
@@ -205,14 +297,22 @@ var PIXI_LIVE2D;
         Live2DPixiModel.prototype.showTickFPS = function () {
             console.log(this._app.ticker.FPS);
         };
+        Live2DPixiModel.prototype.rePosition = function (positionX, positionY, scale) {
+            if (positionX === void 0) { positionX = this._canvasDefine._x; }
+            if (positionY === void 0) { positionY = this._canvasDefine._y; }
+            if (scale === void 0) { scale = this._canvasDefine._scale; }
+            this._canvasDefine._x = positionX;
+            this._canvasDefine._y = positionY;
+            this._canvasDefine._scale = scale;
+            this._model.position = new PIXI.Point(positionX, positionY);
+            this._model.scale = new PIXI.Point(scale, scale);
+        };
         Live2DPixiModel.prototype.resize = function () {
             var width = this._canvasDefine._width;
             var height = this._canvasDefine._height;
             this._app.view.style.width = width + "px";
             this._app.view.style.height = height + "px";
             this._app.renderer.resize(width, height);
-            this._model.position = new PIXI.Point(this._canvasDefine._x, this._canvasDefine._y);
-            this._model.scale = new PIXI.Point(this._canvasDefine._scaleX, this._canvasDefine._scaleY);
             this._model.masks.resize(this._app.view.width, this._app.view.height);
         };
         Live2DPixiModel.prototype.destroy = function () {

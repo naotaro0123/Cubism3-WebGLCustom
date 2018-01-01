@@ -19,15 +19,12 @@ export namespace LIVE2DDEFINE
         _height: number = 400;
         _x: number = 200;
         _y: number = 300;
-        _scaleX: number = 400;
-        _scaleY: number = 400;
-        _bgcolor: any = 0x1099bb;
+        _scale: number = 400;
     }
 
     export const MODELS_DEFINE : any = {};
 
     export const MODELS_NAME : any = [
-        "haru", 'koharu', 'unitychan',
         "haru", 'koharu', 'unitychan'
     ];
 

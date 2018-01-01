@@ -13,6 +13,16 @@ export namespace PIXI_LIVE2D {
         private _model: LIVE2DCUBISMPIXI.Model;
         private _modelId: string;
         private _loader: PIXI.loaders.Loader;
+        private _mouse_x: number = 0;   // マウス座標X
+        private _mouse_y: number = 0;   // マウス座標Y
+        private _pos_x: number = 0;     // 正規化したマウス座標X
+        private _pos_y: number = 0;     // 正規化したマウス座標Y
+        private _parameterIndexAngleX: number;  // PARAM_ANGLE_XのIndex
+        private _parameterIndexAngleY: number;  // PARAM_ANGLE_YのIndex
+        private _parameterIndexBodyAngleX: number; // PARAM_BODY_ANGLE_XのIndex
+        private _parameterIndexEyeX: number;    // PARAM_EYE_BALL_XのIndex
+        private _parameterIndexEyeY: number;    // PARAM_EYE_BALL_YのIndex
+        private _dragging: boolean = false;
 
         constructor(app: PIXI.Application, loader: PIXI.loaders.Loader, modelInfo: any,
             modelId: string, canvasDefine: LIVE2DDEFINE.CANVAS, modelDefine: LIVE2DDEFINE.MODEL){
@@ -34,10 +44,54 @@ export namespace PIXI_LIVE2D {
                 this.loadResources(resources);
                 this.loadAnimations(resources);
                 this.playAnimation(0);
+                this.rePosition();
+                this.onDragEvent();
+
                 this.resize();
                 window.onresize = this.resize;
                 this.tick();
             });
+        }
+
+        onDragEvent(){
+            this._parameterIndexAngleX = this._model.parameters.ids.indexOf("PARAM_ANGLE_X");
+            this._parameterIndexAngleY = this._model.parameters.ids.indexOf("PARAM_ANGLE_Y");
+            this._parameterIndexBodyAngleX = this._model.parameters.ids.indexOf("PARAM_BODY_ANGLE_X");
+            this._parameterIndexEyeX = this._model.parameters.ids.indexOf("PARAM_EYE_BALL_X");
+            this._parameterIndexEyeY = this._model.parameters.ids.indexOf("PARAM_EYE_BALL_Y");
+
+            this._app.view.addEventListener('pointerdown', this._onDragStart.bind(this), false);
+            this._app.view.addEventListener('pointerup', this._onDragEnd.bind(this), false);
+            this._app.view.addEventListener('pointerout', this._onDragEnd.bind(this), false);
+            this._app.view.addEventListener('pointermove', this._onDragMove.bind(this), false);
+
+        }
+
+        _onDragStart(event: any){
+            this._dragging = true;
+        }
+
+        _onDragEnd(event: any){
+            this._dragging = false;
+            this._pos_x = 0.0;
+            this._pos_y = 0.0;
+        }
+
+        _onDragMove(event: any){
+            // if(this._dragging){
+                // ドラッグ用にマウス座標を取得（offsetはクリックした位置）
+                this._mouse_x = this._model.position.x - event.offsetX;
+                this._mouse_y = this._model.position.y - event.offsetY;
+
+                // マウス座標を-1.0〜1.0に正規化
+                let height = this._app.screen.height / 2;
+                let width = this._app.screen.width / 2;
+                let scale = 1.0 - (height / this._canvasDefine._scale);
+                this._pos_x = - this._mouse_x / height;
+                // Yは頭の位置分を調整
+                this._pos_y = - (this._mouse_y / width) + scale;
+
+            // }
         }
 
         loadMoc(){
@@ -91,7 +145,6 @@ export namespace PIXI_LIVE2D {
             // Add model to stage.
             this._app.stage.addChild(this._model);
             this._app.stage.addChild(this._model.masks);
-
         }
 
         loadAnimations(_resources: PIXI.loaders.ResourceDictionary){
@@ -122,13 +175,37 @@ export namespace PIXI_LIVE2D {
         tick(){
             // Set up ticker.
             this._app.ticker.add((deltaTime) => {
+                this.resize();
+                this.rePosition();
+                this._updateParameter();
+
                 this._model.update(deltaTime);
                 this._model.masks.update(this._app.renderer);
-                // console.log("tick");
+
             });
         }
-        changeColor(r: any, g: any, b: any){
 
+        _updateParameter(){
+            this._model.parameters.values[this._parameterIndexAngleX] = this._pos_x * 30;
+            this._model.parameters.values[this._parameterIndexAngleY] = -this._pos_y * 30;
+            this._model.parameters.values[this._parameterIndexBodyAngleX] = this._pos_x * 10;
+            this._model.parameters.values[this._parameterIndexEyeX] = this._pos_x;
+            this._model.parameters.values[this._parameterIndexEyeY] = -this._pos_y;
+        }
+
+        changeBlend(i: number){
+            if(i % 2 == 0){
+                this._model.animator.getLayer(`Base_${this._canvasDefine._id}`).blend =
+                LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.ADD;
+            }else{
+                this._model.animator.getLayer(`Base_${this._canvasDefine._id}`).blend =
+                LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE;
+            }
+        }
+
+        changeOpacity(opacity: string)
+        {
+            this._app.view.style.opacity = opacity;
         }
 
         setTickSpeed(speed: number = 1){
@@ -139,6 +216,19 @@ export namespace PIXI_LIVE2D {
             console.log(this._app.ticker.FPS);
         }
 
+        rePosition(positionX: number = this._canvasDefine._x,
+            positionY: number = this._canvasDefine._y,
+            scale: number = this._canvasDefine._scale)
+        {
+            this._canvasDefine._x = positionX;
+            this._canvasDefine._y = positionY;
+            this._canvasDefine._scale = scale;
+            // Resize model.
+            this._model.position = new PIXI.Point(positionX, positionY);
+            this._model.scale = new PIXI.Point(scale, scale);
+
+        }
+
         resize(){
             let width = this._canvasDefine._width;
             let height = this._canvasDefine._height;
@@ -146,11 +236,6 @@ export namespace PIXI_LIVE2D {
             this._app.view.style.width = `${width}px`;
             this._app.view.style.height = `${height}px`;
             this._app.renderer.resize(width, height);
-            // Resize model.
-            // model.position = new PIXI.Point((width * 0.5), (height * 0.5));
-            this._model.position = new PIXI.Point(this._canvasDefine._x, this._canvasDefine._y);
-            // model.scale = new PIXI.Point((model.position.x * 0.8), (model.position.x * 0.8));
-            this._model.scale = new PIXI.Point(this._canvasDefine._scaleX, this._canvasDefine._scaleY);
             // Resize mask texture.
             this._model.masks.resize(this._app.view.width, this._app.view.height);
         }

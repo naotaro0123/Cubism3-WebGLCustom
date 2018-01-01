@@ -30,7 +30,7 @@ gulp.task('copy-assets', function() {
 
 gulp.task('browserify', function() {
     return browserify({
-            entries: ['./wwwroot/js/Define.js', './wwwroot/js/Live2DInit.js', './wwwroot/js/Live2DModel.js']
+            entries: ['./wwwroot/js/Define.js', './wwwroot/js/Live2DInit.js', './wwwroot/js/Live2DPixiModel.js']
         }).plugin('tsify')
         .bundle()
         .pipe(source('app.js'))
@@ -38,7 +38,7 @@ gulp.task('browserify', function() {
 });
 
 gulp.task('clean', function() {
-    del(['./wwwroot/js/Define.js', './wwwroot/js/Live2DInit.js', './wwwroot/js/Live2DModel.js']);
+    del(['./wwwroot/js/Define.js', './wwwroot/js/Live2DInit.js', './wwwroot/js/Live2DPixiModel.js']);
 });
 
 gulp.task('default', function() {
@@ -52,5 +52,10 @@ gulp.task('default', function() {
 });
 
 gulp.task('watch', function() {
-    gulp.watch('./src/tsc/*.ts', ['default']);
+    let targets = [
+        './src/css/*.css',
+        './src/tsc/*.ts',
+        './src/index.html',
+    ];
+    gulp.watch(targets, ['default']);
 });
