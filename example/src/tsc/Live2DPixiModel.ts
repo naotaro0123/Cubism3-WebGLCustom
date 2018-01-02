@@ -1,4 +1,5 @@
 import { LIVE2DDEFINE } from './Define';
+import { LIVE2DSOUND } from './Sound';
 
 
 export namespace PIXI_LIVE2D {
@@ -10,6 +11,7 @@ export namespace PIXI_LIVE2D {
         private _moc: any;
         private _modelbuilder: LIVE2DCUBISMPIXI.ModelBuilder;
         private _animations: LIVE2DCUBISMFRAMEWORK.Animation[];
+        private _sounds: LIVE2DSOUND.Sound[] = [];
         private _model: LIVE2DCUBISMPIXI.Model;
         private _modelId: string;
         private _loader: PIXI.loaders.Loader;
@@ -22,6 +24,7 @@ export namespace PIXI_LIVE2D {
         private _parameterIndexBodyAngleX: number; // PARAM_BODY_ANGLE_XのIndex
         private _parameterIndexEyeX: number;    // PARAM_EYE_BALL_XのIndex
         private _parameterIndexEyeY: number;    // PARAM_EYE_BALL_YのIndex
+        private _parameterIndexMouthOpenY: number; // PARAM_MOUTH_OPEN_YのIndex
         private _dragging: boolean = false;
 
         constructor(app: PIXI.Application, loader: PIXI.loaders.Loader, modelInfo: any,
@@ -40,6 +43,7 @@ export namespace PIXI_LIVE2D {
             this.loadTextures();
             this.loadMotions();
             this.loadPhysics();
+            this.loadSounds();
             PIXI.loader.load((loader: PIXI.loaders.Loader, resources: PIXI.loaders.ResourceDictionary) => {
                 this.loadResources(resources);
                 this.loadAnimations(resources);
@@ -53,6 +57,90 @@ export namespace PIXI_LIVE2D {
             });
         }
 
+        loadMoc(){
+            PIXI.loader.add(`Moc_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Moc,
+                { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER });
+        }
+
+        loadTextures(){
+            for(let i = 0; i < this._modelInfo.Textures.length; i++)
+            {
+                PIXI.loader.add(`Texture${i}_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Textures[i]);
+            }
+        }
+
+        loadMotions(){
+            if(this._modelInfo.Motions !== void 0){
+                for(let i = 0; i < this._modelInfo.Motions.length; i++)
+                {
+                    PIXI.loader.add(`Motion${i}_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Motions[i],
+                                    { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
+                }
+            }
+        }
+
+        loadPhysics(){
+            if(this._modelInfo.Physics !== void 0){
+                PIXI.loader.add(`Physics_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Physics,
+                { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
+            }
+        }
+
+        loadSounds(){
+            if(this._modelInfo.Sounds !== void 0){
+                for(let i = 0; i < this._modelInfo.Sounds.length; i++)
+                {
+                    PIXI.loader.add(`Sound${i}_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Sounds[i],
+                                    { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER });
+                }
+            }
+        }
+
+        loadResources(_resources: PIXI.loaders.ResourceDictionary){
+            // Load moc.
+            this._moc = LIVE2DCUBISMCORE.Moc.fromArrayBuffer(_resources[`Moc_${this._canvasDefine._id}`].data);
+            this._modelbuilder = new LIVE2DCUBISMPIXI.ModelBuilder();
+            this._modelbuilder.setMoc(this._moc)
+                                .setTimeScale(1);
+            // Texture
+            for(let i = 0; i < this._modelInfo.Textures.length; i++)
+            {
+                this._modelbuilder.addTexture(i, _resources[`Texture${i}_${this._canvasDefine._id}`].texture);
+            }
+            // Motion
+            this._modelbuilder.addAnimatorLayer(`Base_${this._canvasDefine._id}`,
+                LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
+            this._modelbuilder.addAnimatorLayer(`Lipsync_${this._canvasDefine._id}`,
+            LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
+            // PhySics
+            if(_resources[`Physics_${this._canvasDefine._id}`] !== void 0){
+                this._modelbuilder.setPhysics3Json(_resources[`Physics_${this._canvasDefine._id}`].data);
+            }
+            // Sounds
+            if(this._modelInfo.Sounds !== void 0){
+                for(let i = 0; i < this._modelInfo.Sounds.length; i++){
+                    this._sounds[i] = new LIVE2DSOUND.Sound(_resources[`Sound${i}_${this._canvasDefine._id}`].data);
+                }
+            }
+
+            this._model = this._modelbuilder.build();
+            // Add model to stage.
+            this._app.stage.addChild(this._model);
+            this._app.stage.addChild(this._model.masks);
+        }
+
+        loadAnimations(_resources: PIXI.loaders.ResourceDictionary){
+            // Load animation.
+            this._animations = [];
+            if(this._modelInfo.Motions !== void 0){
+                for(let i = 0; i < this._modelInfo.Motions.length; i++)
+                {
+                    this._animations[i] =
+                        LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(_resources[`Motion${i}_${this._canvasDefine._id}`].data);
+                }
+            }
+        }
+
         onDragEvent(){
             this._parameterIndexAngleX = this._model.parameters.ids.indexOf("PARAM_ANGLE_X");
             this._parameterIndexAngleY = this._model.parameters.ids.indexOf("PARAM_ANGLE_Y");
@@ -64,7 +152,6 @@ export namespace PIXI_LIVE2D {
             this._app.view.addEventListener('pointerup', this._onDragEnd.bind(this), false);
             this._app.view.addEventListener('pointerout', this._onDragEnd.bind(this), false);
             this._app.view.addEventListener('pointermove', this._onDragMove.bind(this), false);
-
         }
 
         _onDragStart(event: any){
@@ -94,74 +181,21 @@ export namespace PIXI_LIVE2D {
             // }
         }
 
-        loadMoc(){
-            PIXI.loader.add(`Moc_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Moc,
-                { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER });
-        }
-
-        loadTextures(){
-            for(var i = 0; i < this._modelInfo.Textures.length; i++)
-            {
-                PIXI.loader.add(`Texture${i}_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Textures[i]);
-            }
-        }
-
-        loadMotions(){
-            if(this._modelInfo.Motions !== void 0){
-                for(var i = 0; i < this._modelInfo.Motions.length; i++)
-                {
-                    PIXI.loader.add(`Motion${i}_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Motions[i],
-                                    { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
-                }
-            }
-        }
-
-        loadPhysics(){
-            if(this._modelInfo.Physics !== void 0){
-                PIXI.loader.add(`Physics_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Physics,
-                { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
-            }
-        }
-
-        loadResources(_resources: PIXI.loaders.ResourceDictionary){
-            // Load moc.
-            this._moc = LIVE2DCUBISMCORE.Moc.fromArrayBuffer(_resources[`Moc_${this._canvasDefine._id}`].data);
-            this._modelbuilder = new LIVE2DCUBISMPIXI.ModelBuilder();
-            this._modelbuilder.setMoc(this._moc)
-                                .setTimeScale(1);
-            // Texture
-            for(var i =0; i < this._modelInfo.Textures.length; i++)
-            {
-                this._modelbuilder.addTexture(i, _resources[`Texture${i}_${this._canvasDefine._id}`].texture);
-            }
-            // Motion
-            this._modelbuilder.addAnimatorLayer(`Base_${this._canvasDefine._id}`,
-                LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
-            // PhySics
-            if(_resources[`Physics_${this._canvasDefine._id}`] !== void 0){
-                this._modelbuilder.setPhysics3Json(_resources[`Physics_${this._canvasDefine._id}`].data);
-            }
-            this._model = this._modelbuilder.build();
-            // Add model to stage.
-            this._app.stage.addChild(this._model);
-            this._app.stage.addChild(this._model.masks);
-        }
-
-        loadAnimations(_resources: PIXI.loaders.ResourceDictionary){
-            // Load animation.
-            this._animations = [];
-            if(this._modelInfo.Motions !== void 0){
-                for(var i = 0; i < this._modelInfo.Motions.length; i++)
-                {
-                    this._animations[i] =
-                        LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(_resources[`Motion${i}_${this._canvasDefine._id}`].data);
-                }
-            }
-        }
-
         playAnimation(i: number){
             // Play animation.
             this._model.animator.getLayer(`Base_${this._canvasDefine._id}`).play(this._animations[i]);
+        }
+
+        playLipsync(){
+            this._animations[0].evaluate = (time, weight, blend, target) => {
+                this._parameterIndexMouthOpenY = target.parameters.ids.indexOf("PARAM_MOUTH_OPEN_Y");
+                if (this._parameterIndexMouthOpenY >= 0) {
+                    const sample = (Math.sin(time*9.543)+1 + Math.sin(time*13.831))/2;
+                    target.parameters.values[this._parameterIndexMouthOpenY] =
+                    blend(target.parameters.values[this._parameterIndexMouthOpenY], sample, weight);
+                }
+            }
+            this._model.animator.getLayer(`Lipsync_${this._canvasDefine._id}`).play(this._animations[0]);
         }
 
         stopAnimation(){
@@ -170,6 +204,14 @@ export namespace PIXI_LIVE2D {
 
         setLoop(loop : boolean){
             this._model.animator.getLayer(`Base_${this._canvasDefine._id}`).currentAnimation.loop = loop;
+        }
+
+        playSound(i: number){
+            this._sounds[i].play();
+        }
+
+        stopSound(i: number){
+            this._sounds[i].stop();
         }
 
         tick(){
@@ -186,11 +228,21 @@ export namespace PIXI_LIVE2D {
         }
 
         _updateParameter(){
-            this._model.parameters.values[this._parameterIndexAngleX] = this._pos_x * 30;
-            this._model.parameters.values[this._parameterIndexAngleY] = -this._pos_y * 30;
-            this._model.parameters.values[this._parameterIndexBodyAngleX] = this._pos_x * 10;
-            this._model.parameters.values[this._parameterIndexEyeX] = this._pos_x;
-            this._model.parameters.values[this._parameterIndexEyeY] = -this._pos_y;
+            if(this._parameterIndexAngleX >= 0){
+                this._model.parameters.values[this._parameterIndexAngleX] = this._pos_x * 30;
+            }
+            if(this._parameterIndexAngleY >= 0){
+                this._model.parameters.values[this._parameterIndexAngleY] = -this._pos_y * 30;
+            }
+            if(this._parameterIndexBodyAngleX >= 0){
+                this._model.parameters.values[this._parameterIndexBodyAngleX] = this._pos_x * 10;
+            }
+            if(this._parameterIndexEyeX >= 0){
+                this._model.parameters.values[this._parameterIndexEyeX] = this._pos_x;
+            }
+            if(this._parameterIndexEyeY >= 0){
+                this._model.parameters.values[this._parameterIndexEyeY] = -this._pos_y;
+            }
         }
 
         changeBlend(i: number){

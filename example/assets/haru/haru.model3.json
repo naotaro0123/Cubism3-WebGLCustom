@@ -8,6 +8,7 @@
             "haru.1024/texture_02.png"
         ],
         "Motions": [
+            "motions/empty.motion3.json",
             "motions/haru_idle_01.motion3.json",
             "motions/haru_idle_02.motion3.json",
             "motions/haru_idle_03.motion3.json",
@@ -21,6 +22,18 @@
             "motions/haru_m_08.motion3.json",
             "motions/haru_m_09.motion3.json",
             "motions/haru_m_10.motion3.json"
+        ],
+        "Sounds": [
+            "sounds/haru_normal_01.mp3",
+            "sounds/haru_normal_02.mp3",
+            "sounds/haru_normal_03.mp3",
+            "sounds/haru_normal_04.mp3",
+            "sounds/haru_normal_05.mp3",
+            "sounds/haru_normal_06.mp3",
+            "sounds/haru_normal_07.mp3",
+            "sounds/haru_normal_08.mp3",
+            "sounds/haru_normal_09.mp3",
+            "sounds/haru_normal_10.mp3"
         ],
         "Physics": "Physics.physics3.json"
     }

@@ -115,4 +115,28 @@ document.addEventListener("DOMContentLoaded", () => {
         blendCnt++;
         Live2Dcanvas[Live2Dglno].changeBlend(blendCnt);
     }, false);
+
+    let soundCnt : number = 0;
+    // 音声切り替え
+    document.getElementById("changeSound").addEventListener("click", () => {
+        soundCnt++;
+        if(soundCnt >= modelInfo.Sounds.length){
+            soundCnt = 0;
+        }
+
+        Live2Dcanvas[Live2Dglno].playSound(soundCnt);
+
+        document.getElementById("soundNm").innerHTML =
+        `${modelInfo.Sounds[soundCnt]}`.replace("sounds/","").replace(".mp3","");
+
+    }, false);
+    // 音声停止
+    document.getElementById("stopSound").addEventListener("click", () => {
+        Live2Dcanvas[Live2Dglno].stopSound(soundCnt);
+    });
+
+    // リップシンク
+    document.getElementById("changeLipsync").addEventListener("click", () => {
+        Live2Dcanvas[Live2Dglno].playLipsync();
+    });
 });
