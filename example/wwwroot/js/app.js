@@ -56,36 +56,36 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Define_1 = require("./Define");
 var Live2DPixiModel_1 = require("./Live2DPixiModel");
 document.addEventListener("DOMContentLoaded", function () {
-    var modelId = [];
-    var modelDef = [];
-    var modelInfo;
+    var model_id = [];
+    var model_def = [];
+    var model_info;
     var app;
-    var Live2Dglno = 0;
-    var Live2Dcanvas = [];
-    init(Live2Dglno);
+    var Live2d_no = 0;
+    var Live2d_canvas = [];
+    init(Live2d_no);
     function init(i) {
         if (i === void 0) { i = 0; }
-        modelId[i] = Define_1.LIVE2DDEFINE.MODELS_NAME[i];
-        modelDef[i] = Define_1.LIVE2DDEFINE.MODELS_DEFINE[modelId[i]];
-        app = new PIXI.Application(modelDef[i].Canvas._width, modelDef[i].Canvas._height, { transparent: true });
-        app.view.id = modelDef[i].Canvas._id;
-        PIXI.loader.add("ModelJson_" + modelDef[i].Canvas._id, modelDef[i].Model._filepath + modelDef[i].Model._modeljson, { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
+        model_id[i] = Define_1.LIVE2DDEFINE.MODELS_NAME[i];
+        model_def[i] = Define_1.LIVE2DDEFINE.MODELS_DEFINE[model_id[i]];
+        app = new PIXI.Application(model_def[i].Canvas._width, model_def[i].Canvas._height, { transparent: true });
+        app.view.id = model_def[i].Canvas._id;
+        PIXI.loader.add("ModelJson_" + model_def[i].Canvas._id, model_def[i].Model._filepath + model_def[i].Model._modeljson, { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
         PIXI.loader.load(function (loader, resources) {
-            modelInfo = resources["ModelJson_" + modelDef[i].Canvas._id].data.FileReferences;
-            Live2Dcanvas[i] = new Live2DPixiModel_1.PIXI_LIVE2D.Live2DPixiModel(app, loader, modelInfo, modelId[i], modelDef[i].Canvas, modelDef[i].Model);
+            model_info = resources["ModelJson_" + model_def[i].Canvas._id].data.FileReferences;
+            Live2d_canvas[i] = new Live2DPixiModel_1.PIXI_LIVE2D.Live2DPixiModel(app, loader, model_info, model_id[i], model_def[i].Canvas, model_def[i].Model);
             document.body.appendChild(app.view);
         });
     }
     var animCnt = 0;
     document.getElementById("changeMotion").addEventListener("click", function () {
         animCnt++;
-        if (animCnt >= modelInfo.Motions.length) {
+        if (animCnt >= model_info.Motions.length) {
             animCnt = 0;
         }
         changeLoop.innerHTML = "ループON";
-        Live2Dcanvas[Live2Dglno].playAnimation(animCnt);
+        Live2d_canvas[Live2d_no].playAnimation(animCnt);
         document.getElementById("motionNm").innerText =
-            ("" + modelInfo.Motions[animCnt]).replace("motions/", "").replace(".motion3.json", "");
+            ("" + model_info.Motions[animCnt]).replace("motions/", "").replace(".motion3.json", "");
     }, false);
     var changeLoop = document.getElementById("changeLoop");
     changeLoop.addEventListener("click", function () {
@@ -95,37 +95,37 @@ document.addEventListener("DOMContentLoaded", function () {
         else {
             changeLoop.innerHTML = "ループON";
         }
-        Live2Dcanvas[Live2Dglno].setLoop(false);
+        Live2d_canvas[Live2d_no].setLoop(false);
     }, false);
     document.getElementById("deletebtn").addEventListener("click", function () {
-        var ele = document.getElementById(modelDef[Live2Dglno].Canvas._id);
+        var ele = document.getElementById(model_def[Live2d_no].Canvas._id);
         document.body.removeChild(ele);
-        Live2Dcanvas[Live2Dglno].destroy();
-        Live2Dglno--;
+        Live2d_canvas[Live2d_no].destroy();
+        Live2d_no--;
     });
     document.getElementById("changeChara").addEventListener("click", function () {
-        Live2Dglno++;
-        init(Live2Dglno);
+        Live2d_no++;
+        init(Live2d_no);
     });
     var opacitySlider = document.getElementById("opacitySlider");
     opacitySlider.addEventListener("input", function () {
-        Live2Dcanvas[Live2Dglno].changeOpacity(opacitySlider.value);
+        Live2d_canvas[Live2d_no].changeOpacity(opacitySlider.value);
     });
     var positionXSlider = document.getElementById("positionXSlider");
     positionXSlider.addEventListener("input", function () {
-        Live2Dcanvas[Live2Dglno].rePosition(positionXSlider.value, positionYSlider.value, scaleSlider.value);
+        Live2d_canvas[Live2d_no].rePosition(positionXSlider.value, positionYSlider.value, scaleSlider.value);
     });
     var positionYSlider = document.getElementById("positionYSlider");
     positionYSlider.addEventListener("input", function () {
-        Live2Dcanvas[Live2Dglno].rePosition(positionXSlider.value, positionYSlider.value, scaleSlider.value);
+        Live2d_canvas[Live2d_no].rePosition(positionXSlider.value, positionYSlider.value, scaleSlider.value);
     });
     var scaleSlider = document.getElementById("scaleSlider");
     scaleSlider.addEventListener("input", function () {
-        Live2Dcanvas[Live2Dglno].rePosition(positionXSlider.value, positionYSlider.value, scaleSlider.value);
+        Live2d_canvas[Live2d_no].rePosition(positionXSlider.value, positionYSlider.value, scaleSlider.value);
     });
     var speedSlider = document.getElementById("speedSlider");
     speedSlider.addEventListener("input", function () {
-        Live2Dcanvas[Live2Dglno].setTickSpeed(speedSlider.value);
+        Live2d_canvas[Live2d_no].setTickSpeed(speedSlider.value);
     });
     var blendCnt = 1;
     var changeBlend = document.getElementById("changeBlend");
@@ -137,23 +137,23 @@ document.addEventListener("DOMContentLoaded", function () {
             changeBlend.innerHTML = "ブレンドOVERRIDE";
         }
         blendCnt++;
-        Live2Dcanvas[Live2Dglno].changeBlend(blendCnt);
+        Live2d_canvas[Live2d_no].changeBlend(blendCnt);
     }, false);
     var soundCnt = 0;
     document.getElementById("changeSound").addEventListener("click", function () {
         soundCnt++;
-        if (soundCnt >= modelInfo.Sounds.length) {
+        if (soundCnt >= model_info.Sounds.length) {
             soundCnt = 0;
         }
-        Live2Dcanvas[Live2Dglno].playSound(soundCnt);
+        Live2d_canvas[Live2d_no].playSound(soundCnt);
         document.getElementById("soundNm").innerHTML =
-            ("" + modelInfo.Sounds[soundCnt]).replace("sounds/", "").replace(".mp3", "");
+            ("" + model_info.Sounds[soundCnt]).replace("sounds/", "").replace(".mp3", "");
     }, false);
     document.getElementById("stopSound").addEventListener("click", function () {
-        Live2Dcanvas[Live2Dglno].stopSound(soundCnt);
+        Live2d_canvas[Live2d_no].stopSound(soundCnt);
     });
     document.getElementById("changeLipsync").addEventListener("click", function () {
-        Live2Dcanvas[Live2Dglno].playLipsync();
+        Live2d_canvas[Live2d_no].playLipsync();
     });
 });
 
@@ -164,7 +164,7 @@ var Sound_1 = require("./Sound");
 var PIXI_LIVE2D;
 (function (PIXI_LIVE2D) {
     var Live2DPixiModel = (function () {
-        function Live2DPixiModel(app, loader, modelInfo, modelId, canvasDefine, modelDefine) {
+        function Live2DPixiModel(app, loader, model_info, model_id, canvas_def, model_def) {
             this._sounds = [];
             this._mouse_x = 0;
             this._mouse_y = 0;
@@ -173,10 +173,10 @@ var PIXI_LIVE2D;
             this._dragging = false;
             this._app = app;
             this._loader = loader;
-            this._modelInfo = modelInfo;
-            this._modelId = modelId;
-            this._canvasDefine = canvasDefine;
-            this._modelDefine = modelDefine;
+            this._model_info = model_info;
+            this._model_id = model_id;
+            this._canvas_def = canvas_def;
+            this._model_def = model_def;
             this.init();
         }
         Live2DPixiModel.prototype.init = function () {
@@ -198,48 +198,49 @@ var PIXI_LIVE2D;
             });
         };
         Live2DPixiModel.prototype.loadMoc = function () {
-            PIXI.loader.add("Moc_" + this._canvasDefine._id, this._modelDefine._filepath + this._modelInfo.Moc, { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER });
+            PIXI.loader.add("Moc_" + this._canvas_def._id, this._model_def._filepath + this._model_info.Moc, { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER });
         };
         Live2DPixiModel.prototype.loadTextures = function () {
-            for (var i = 0; i < this._modelInfo.Textures.length; i++) {
-                PIXI.loader.add("Texture" + i + "_" + this._canvasDefine._id, this._modelDefine._filepath + this._modelInfo.Textures[i]);
+            for (var i = 0; i < this._model_info.Textures.length; i++) {
+                PIXI.loader.add("Texture" + i + "_" + this._canvas_def._id, this._model_def._filepath + this._model_info.Textures[i]);
             }
         };
         Live2DPixiModel.prototype.loadMotions = function () {
-            if (this._modelInfo.Motions !== void 0) {
-                for (var i = 0; i < this._modelInfo.Motions.length; i++) {
-                    PIXI.loader.add("Motion" + i + "_" + this._canvasDefine._id, this._modelDefine._filepath + this._modelInfo.Motions[i], { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
+            if (this._model_info.Motions !== void 0) {
+                for (var i = 0; i < this._model_info.Motions.length; i++) {
+                    PIXI.loader.add("Motion" + i + "_" + this._canvas_def._id, this._model_def._filepath + this._model_info.Motions[i], { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
                 }
             }
         };
         Live2DPixiModel.prototype.loadPhysics = function () {
-            if (this._modelInfo.Physics !== void 0) {
-                PIXI.loader.add("Physics_" + this._canvasDefine._id, this._modelDefine._filepath + this._modelInfo.Physics, { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
+            if (this._model_info.Physics !== void 0) {
+                PIXI.loader.add("Physics_" + this._canvas_def._id, this._model_def._filepath + this._model_info.Physics, { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
             }
         };
         Live2DPixiModel.prototype.loadSounds = function () {
-            if (this._modelInfo.Sounds !== void 0) {
-                for (var i = 0; i < this._modelInfo.Sounds.length; i++) {
-                    PIXI.loader.add("Sound" + i + "_" + this._canvasDefine._id, this._modelDefine._filepath + this._modelInfo.Sounds[i], { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER });
+            if (this._model_info.Sounds !== void 0) {
+                for (var i = 0; i < this._model_info.Sounds.length; i++) {
+                    PIXI.loader.add("Sound" + i + "_" + this._canvas_def._id, this._model_def._filepath + this._model_info.Sounds[i], { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER });
                 }
             }
         };
         Live2DPixiModel.prototype.loadResources = function (_resources) {
-            this._moc = LIVE2DCUBISMCORE.Moc.fromArrayBuffer(_resources["Moc_" + this._canvasDefine._id].data);
+            this._moc = LIVE2DCUBISMCORE.Moc.fromArrayBuffer(_resources["Moc_" + this._canvas_def._id].data);
             this._modelbuilder = new LIVE2DCUBISMPIXI.ModelBuilder();
             this._modelbuilder.setMoc(this._moc)
                 .setTimeScale(1);
-            for (var i = 0; i < this._modelInfo.Textures.length; i++) {
-                this._modelbuilder.addTexture(i, _resources["Texture" + i + "_" + this._canvasDefine._id].texture);
+            for (var i = 0; i < this._model_info.Textures.length; i++) {
+                this._modelbuilder.addTexture(i, _resources["Texture" + i + "_" + this._canvas_def._id].texture);
             }
-            this._modelbuilder.addAnimatorLayer("Base_" + this._canvasDefine._id, LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
-            this._modelbuilder.addAnimatorLayer("Lipsync_" + this._canvasDefine._id, LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
-            if (_resources["Physics_" + this._canvasDefine._id] !== void 0) {
-                this._modelbuilder.setPhysics3Json(_resources["Physics_" + this._canvasDefine._id].data);
+            this._modelbuilder.addAnimatorLayer("Base_" + this._canvas_def._id, LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
+            this._modelbuilder.addAnimatorLayer("Lipsync_" + this._canvas_def._id, LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
+            this._modelbuilder.addAnimatorLayer("Drag_" + this._canvas_def._id, LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
+            if (_resources["Physics_" + this._canvas_def._id] !== void 0) {
+                this._modelbuilder.setPhysics3Json(_resources["Physics_" + this._canvas_def._id].data);
             }
-            if (this._modelInfo.Sounds !== void 0) {
-                for (var i = 0; i < this._modelInfo.Sounds.length; i++) {
-                    this._sounds[i] = new Sound_1.LIVE2DSOUND.Sound(_resources["Sound" + i + "_" + this._canvasDefine._id].data);
+            if (this._model_info.Sounds !== void 0) {
+                for (var i = 0; i < this._model_info.Sounds.length; i++) {
+                    this._sounds[i] = new Sound_1.LIVE2DSOUND.Sound(_resources["Sound" + i + "_" + this._canvas_def._id].data);
                 }
             }
             this._model = this._modelbuilder.build();
@@ -248,19 +249,19 @@ var PIXI_LIVE2D;
         };
         Live2DPixiModel.prototype.loadAnimations = function (_resources) {
             this._animations = [];
-            if (this._modelInfo.Motions !== void 0) {
-                for (var i = 0; i < this._modelInfo.Motions.length; i++) {
+            if (this._model_info.Motions !== void 0) {
+                for (var i = 0; i < this._model_info.Motions.length; i++) {
                     this._animations[i] =
-                        LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(_resources["Motion" + i + "_" + this._canvasDefine._id].data);
+                        LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(_resources["Motion" + i + "_" + this._canvas_def._id].data);
                 }
             }
         };
         Live2DPixiModel.prototype.onDragEvent = function () {
-            this._parameterIndexAngleX = this._model.parameters.ids.indexOf("PARAM_ANGLE_X");
-            this._parameterIndexAngleY = this._model.parameters.ids.indexOf("PARAM_ANGLE_Y");
-            this._parameterIndexBodyAngleX = this._model.parameters.ids.indexOf("PARAM_BODY_ANGLE_X");
-            this._parameterIndexEyeX = this._model.parameters.ids.indexOf("PARAM_EYE_BALL_X");
-            this._parameterIndexEyeY = this._model.parameters.ids.indexOf("PARAM_EYE_BALL_Y");
+            this._param_angle_x = this._model.parameters.ids.indexOf("PARAM_ANGLE_X");
+            this._param_angle_y = this._model.parameters.ids.indexOf("PARAM_ANGLE_Y");
+            this._param_body_angle_x = this._model.parameters.ids.indexOf("PARAM_BODY_ANGLE_X");
+            this._param_eye_ball_x = this._model.parameters.ids.indexOf("PARAM_EYE_BALL_X");
+            this._param_eye_ball_y = this._model.parameters.ids.indexOf("PARAM_EYE_BALL_Y");
             this._app.view.addEventListener('pointerdown', this._onDragStart.bind(this), false);
             this._app.view.addEventListener('pointerup', this._onDragEnd.bind(this), false);
             this._app.view.addEventListener('pointerout', this._onDragEnd.bind(this), false);
@@ -279,30 +280,30 @@ var PIXI_LIVE2D;
             this._mouse_y = this._model.position.y - event.offsetY;
             var height = this._app.screen.height / 2;
             var width = this._app.screen.width / 2;
-            var scale = 1.0 - (height / this._canvasDefine._scale);
+            var scale = 1.0 - (height / this._canvas_def._scale);
             this._pos_x = -this._mouse_x / height;
             this._pos_y = -(this._mouse_y / width) + scale;
         };
         Live2DPixiModel.prototype.playAnimation = function (i) {
-            this._model.animator.getLayer("Base_" + this._canvasDefine._id).play(this._animations[i]);
+            this._model.animator.getLayer("Base_" + this._canvas_def._id).play(this._animations[i]);
         };
         Live2DPixiModel.prototype.playLipsync = function () {
             var _this = this;
             this._animations[0].evaluate = function (time, weight, blend, target) {
-                _this._parameterIndexMouthOpenY = target.parameters.ids.indexOf("PARAM_MOUTH_OPEN_Y");
-                if (_this._parameterIndexMouthOpenY >= 0) {
+                _this._param_mouth_open_y = target.parameters.ids.indexOf("PARAM_MOUTH_OPEN_Y");
+                if (_this._param_mouth_open_y >= 0) {
                     var sample = (Math.sin(time * 9.543) + 1 + Math.sin(time * 13.831)) / 2;
-                    target.parameters.values[_this._parameterIndexMouthOpenY] =
-                        blend(target.parameters.values[_this._parameterIndexMouthOpenY], sample, weight);
+                    target.parameters.values[_this._param_mouth_open_y] =
+                        blend(target.parameters.values[_this._param_mouth_open_y], sample, weight);
                 }
             };
-            this._model.animator.getLayer("Lipsync_" + this._canvasDefine._id).play(this._animations[0]);
+            this._model.animator.getLayer("Lipsync_" + this._canvas_def._id).play(this._animations[0]);
         };
         Live2DPixiModel.prototype.stopAnimation = function () {
-            this._model.animator.getLayer("Base_" + this._canvasDefine._id).stop();
+            this._model.animator.getLayer("Base_" + this._canvas_def._id).stop();
         };
         Live2DPixiModel.prototype.setLoop = function (loop) {
-            this._model.animator.getLayer("Base_" + this._canvasDefine._id).currentAnimation.loop = loop;
+            this._model.animator.getLayer("Base_" + this._canvas_def._id).currentAnimation.loop = loop;
         };
         Live2DPixiModel.prototype.playSound = function (i) {
             this._sounds[i].play();
@@ -321,29 +322,38 @@ var PIXI_LIVE2D;
             });
         };
         Live2DPixiModel.prototype._updateParameter = function () {
-            if (this._parameterIndexAngleX >= 0) {
-                this._model.parameters.values[this._parameterIndexAngleX] = this._pos_x * 30;
-            }
-            if (this._parameterIndexAngleY >= 0) {
-                this._model.parameters.values[this._parameterIndexAngleY] = -this._pos_y * 30;
-            }
-            if (this._parameterIndexBodyAngleX >= 0) {
-                this._model.parameters.values[this._parameterIndexBodyAngleX] = this._pos_x * 10;
-            }
-            if (this._parameterIndexEyeX >= 0) {
-                this._model.parameters.values[this._parameterIndexEyeX] = this._pos_x;
-            }
-            if (this._parameterIndexEyeY >= 0) {
-                this._model.parameters.values[this._parameterIndexEyeY] = -this._pos_y;
-            }
+            var _this = this;
+            this._animations[0].evaluate = function (time, weight, blend, target) {
+                if (_this._param_angle_x >= 0) {
+                    target.parameters.values[_this._param_angle_x] =
+                        blend(target.parameters.values[_this._param_angle_x], _this._pos_x * 30, weight);
+                }
+                if (_this._param_angle_y >= 0) {
+                    target.parameters.values[_this._param_angle_y] =
+                        blend(target.parameters.values[_this._param_angle_y], -_this._pos_y * 30, weight);
+                }
+                if (_this._param_body_angle_x >= 0) {
+                    target.parameters.values[_this._param_body_angle_x] =
+                        blend(target.parameters.values[_this._param_body_angle_x], _this._pos_x * 10, weight);
+                }
+                if (_this._param_eye_ball_x >= 0) {
+                    target.parameters.values[_this._param_eye_ball_x] =
+                        blend(target.parameters.values[_this._param_eye_ball_x], _this._pos_x, weight);
+                }
+                if (_this._param_eye_ball_y >= 0) {
+                    target.parameters.values[_this._param_eye_ball_y] =
+                        blend(target.parameters.values[_this._param_eye_ball_y], -_this._pos_y, weight);
+                }
+            };
+            this._model.animator.getLayer("Drag_" + this._canvas_def._id).play(this._animations[0]);
         };
         Live2DPixiModel.prototype.changeBlend = function (i) {
             if (i % 2 == 0) {
-                this._model.animator.getLayer("Base_" + this._canvasDefine._id).blend =
+                this._model.animator.getLayer("Base_" + this._canvas_def._id).blend =
                     LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.ADD;
             }
             else {
-                this._model.animator.getLayer("Base_" + this._canvasDefine._id).blend =
+                this._model.animator.getLayer("Base_" + this._canvas_def._id).blend =
                     LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE;
             }
         };
@@ -358,18 +368,18 @@ var PIXI_LIVE2D;
             console.log(this._app.ticker.FPS);
         };
         Live2DPixiModel.prototype.rePosition = function (positionX, positionY, scale) {
-            if (positionX === void 0) { positionX = this._canvasDefine._x; }
-            if (positionY === void 0) { positionY = this._canvasDefine._y; }
-            if (scale === void 0) { scale = this._canvasDefine._scale; }
-            this._canvasDefine._x = positionX;
-            this._canvasDefine._y = positionY;
-            this._canvasDefine._scale = scale;
+            if (positionX === void 0) { positionX = this._canvas_def._x; }
+            if (positionY === void 0) { positionY = this._canvas_def._y; }
+            if (scale === void 0) { scale = this._canvas_def._scale; }
+            this._canvas_def._x = positionX;
+            this._canvas_def._y = positionY;
+            this._canvas_def._scale = scale;
             this._model.position = new PIXI.Point(positionX, positionY);
             this._model.scale = new PIXI.Point(scale, scale);
         };
         Live2DPixiModel.prototype.resize = function () {
-            var width = this._canvasDefine._width;
-            var height = this._canvasDefine._height;
+            var width = this._canvas_def._width;
+            var height = this._canvas_def._height;
             this._app.view.style.width = width + "px";
             this._app.view.style.height = height + "px";
             this._app.renderer.resize(width, height);

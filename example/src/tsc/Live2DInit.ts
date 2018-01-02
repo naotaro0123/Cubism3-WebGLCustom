@@ -3,30 +3,30 @@ import { PIXI_LIVE2D } from './Live2DPixiModel';
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    let modelId: any = [];
-    let modelDef: any = [];
-    let modelInfo: any;
+    let model_id: any = [];
+    let model_def: any = [];
+    let model_info: any;
     let app: PIXI.Application;
-    let Live2Dglno: number = 0;
-    let Live2Dcanvas: any = [];
+    let Live2d_no: number = 0;
+    let Live2d_canvas: any = [];
 
-    init(Live2Dglno);
+    init(Live2d_no);
 
     function init(i: number = 0){
-        modelId[i] = LIVE2DDEFINE.MODELS_NAME[i];
-        modelDef[i] = LIVE2DDEFINE.MODELS_DEFINE[modelId[i]];
+        model_id[i] = LIVE2DDEFINE.MODELS_NAME[i];
+        model_def[i] = LIVE2DDEFINE.MODELS_DEFINE[model_id[i]];
         // Create app.
-        app = new PIXI.Application(modelDef[i].Canvas._width,
-            modelDef[i].Canvas._height, {transparent: true});
-        app.view.id = modelDef[i].Canvas._id;
+        app = new PIXI.Application(model_def[i].Canvas._width,
+            model_def[i].Canvas._height, {transparent: true});
+        app.view.id = model_def[i].Canvas._id;
 
-        PIXI.loader.add(`ModelJson_${modelDef[i].Canvas._id}`, modelDef[i].Model._filepath + modelDef[i].Model._modeljson,
+        PIXI.loader.add(`ModelJson_${model_def[i].Canvas._id}`, model_def[i].Model._filepath + model_def[i].Model._modeljson,
             { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
         PIXI.loader.load((loader: PIXI.loaders.Loader, resources: PIXI.loaders.ResourceDictionary) => {
-            modelInfo = resources[`ModelJson_${modelDef[i].Canvas._id}`].data.FileReferences;
+            model_info = resources[`ModelJson_${model_def[i].Canvas._id}`].data.FileReferences;
 
-            Live2Dcanvas[i] = new PIXI_LIVE2D.Live2DPixiModel(
-                app, loader, modelInfo, modelId[i], modelDef[i].Canvas, modelDef[i].Model);
+            Live2d_canvas[i] = new PIXI_LIVE2D.Live2DPixiModel(
+                app, loader, model_info, model_id[i], model_def[i].Canvas, model_def[i].Model);
 
             document.body.appendChild(app.view);
         });
@@ -38,14 +38,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // モーション切り替え
     document.getElementById("changeMotion").addEventListener("click", () => {
         animCnt++;
-        if(animCnt >= modelInfo.Motions.length){
+        if(animCnt >= model_info.Motions.length){
             animCnt = 0;
         }
         changeLoop.innerHTML = "ループON";
 
-        Live2Dcanvas[Live2Dglno].playAnimation(animCnt);
+        Live2d_canvas[Live2d_no].playAnimation(animCnt);
         document.getElementById("motionNm").innerText =
-         `${modelInfo.Motions[animCnt]}`.replace("motions/","").replace(".motion3.json","");
+         `${model_info.Motions[animCnt]}`.replace("motions/","").replace(".motion3.json","");
     }, false);
 
     // モーションループ On/Off
@@ -56,51 +56,51 @@ document.addEventListener("DOMContentLoaded", () => {
         }else{
             changeLoop.innerHTML = "ループON";
         }
-        Live2Dcanvas[Live2Dglno].setLoop(false);
+        Live2d_canvas[Live2d_no].setLoop(false);
     }, false);
 
     // モデル削除
     document.getElementById("deletebtn").addEventListener("click", () => {
-        let ele = document.getElementById(modelDef[Live2Dglno].Canvas._id);
+        let ele = document.getElementById(model_def[Live2d_no].Canvas._id);
         document.body.removeChild(ele);
-        Live2Dcanvas[Live2Dglno].destroy();
-        Live2Dglno--;
+        Live2d_canvas[Live2d_no].destroy();
+        Live2d_no--;
     });
 
     // キャラ切り替え
     document.getElementById("changeChara").addEventListener("click", () => {
-        Live2Dglno++;
-        init(Live2Dglno);
+        Live2d_no++;
+        init(Live2d_no);
     });
 
     // 透明度
     let opacitySlider = <HTMLInputElement>document.getElementById("opacitySlider");
     opacitySlider.addEventListener("input", () => {
-        Live2Dcanvas[Live2Dglno].changeOpacity(opacitySlider.value);
+        Live2d_canvas[Live2d_no].changeOpacity(opacitySlider.value);
     });
 
     // 位置X
     let positionXSlider = <HTMLInputElement>document.getElementById("positionXSlider");
     positionXSlider.addEventListener("input", () => {
-        Live2Dcanvas[Live2Dglno].rePosition(positionXSlider.value, positionYSlider.value, scaleSlider.value);
+        Live2d_canvas[Live2d_no].rePosition(positionXSlider.value, positionYSlider.value, scaleSlider.value);
     });
 
     // 位置Y
     let positionYSlider = <HTMLInputElement>document.getElementById("positionYSlider");
     positionYSlider.addEventListener("input", () => {
-        Live2Dcanvas[Live2Dglno].rePosition(positionXSlider.value, positionYSlider.value, scaleSlider.value);
+        Live2d_canvas[Live2d_no].rePosition(positionXSlider.value, positionYSlider.value, scaleSlider.value);
     });
 
     // 拡大
     let scaleSlider = <HTMLInputElement>document.getElementById("scaleSlider");
     scaleSlider.addEventListener("input", () => {
-        Live2Dcanvas[Live2Dglno].rePosition(positionXSlider.value, positionYSlider.value, scaleSlider.value);
+        Live2d_canvas[Live2d_no].rePosition(positionXSlider.value, positionYSlider.value, scaleSlider.value);
     });
 
     // モーションスピード
     let speedSlider = <HTMLInputElement>document.getElementById("speedSlider");
     speedSlider.addEventListener("input", () => {
-        Live2Dcanvas[Live2Dglno].setTickSpeed(speedSlider.value);
+        Live2d_canvas[Live2d_no].setTickSpeed(speedSlider.value);
     });
 
     let blendCnt : number = 1;
@@ -113,30 +113,30 @@ document.addEventListener("DOMContentLoaded", () => {
             changeBlend.innerHTML = "ブレンドOVERRIDE";
         }
         blendCnt++;
-        Live2Dcanvas[Live2Dglno].changeBlend(blendCnt);
+        Live2d_canvas[Live2d_no].changeBlend(blendCnt);
     }, false);
 
     let soundCnt : number = 0;
     // 音声切り替え
     document.getElementById("changeSound").addEventListener("click", () => {
         soundCnt++;
-        if(soundCnt >= modelInfo.Sounds.length){
+        if(soundCnt >= model_info.Sounds.length){
             soundCnt = 0;
         }
 
-        Live2Dcanvas[Live2Dglno].playSound(soundCnt);
+        Live2d_canvas[Live2d_no].playSound(soundCnt);
 
         document.getElementById("soundNm").innerHTML =
-        `${modelInfo.Sounds[soundCnt]}`.replace("sounds/","").replace(".mp3","");
+        `${model_info.Sounds[soundCnt]}`.replace("sounds/","").replace(".mp3","");
 
     }, false);
     // 音声停止
     document.getElementById("stopSound").addEventListener("click", () => {
-        Live2Dcanvas[Live2Dglno].stopSound(soundCnt);
+        Live2d_canvas[Live2d_no].stopSound(soundCnt);
     });
 
     // リップシンク
     document.getElementById("changeLipsync").addEventListener("click", () => {
-        Live2Dcanvas[Live2Dglno].playLipsync();
+        Live2d_canvas[Live2d_no].playLipsync();
     });
 });

@@ -6,6 +6,7 @@
             "unitychan.2048/texture_00.png"
         ],
         "Motions": [
+            "motions/empty.motion3.json",
             "motions/idle_01.motion3.json",
             "motions/idle_02.motion3.json",
             "motions/m_01.motion3.json",

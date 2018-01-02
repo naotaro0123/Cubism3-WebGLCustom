@@ -5,36 +5,36 @@ import { LIVE2DSOUND } from './Sound';
 export namespace PIXI_LIVE2D {
     export class Live2DPixiModel {
         private _app: PIXI.Application;
-        private _modelInfo: any;
-        private _canvasDefine: LIVE2DDEFINE.CANVAS;
-        private _modelDefine: LIVE2DDEFINE.MODEL;
+        private _model_info: any;
+        private _canvas_def: LIVE2DDEFINE.CANVAS;
+        private _model_def: LIVE2DDEFINE.MODEL;
         private _moc: any;
         private _modelbuilder: LIVE2DCUBISMPIXI.ModelBuilder;
         private _animations: LIVE2DCUBISMFRAMEWORK.Animation[];
         private _sounds: LIVE2DSOUND.Sound[] = [];
         private _model: LIVE2DCUBISMPIXI.Model;
-        private _modelId: string;
+        private _model_id: string;
         private _loader: PIXI.loaders.Loader;
         private _mouse_x: number = 0;   // マウス座標X
         private _mouse_y: number = 0;   // マウス座標Y
         private _pos_x: number = 0;     // 正規化したマウス座標X
         private _pos_y: number = 0;     // 正規化したマウス座標Y
-        private _parameterIndexAngleX: number;  // PARAM_ANGLE_XのIndex
-        private _parameterIndexAngleY: number;  // PARAM_ANGLE_YのIndex
-        private _parameterIndexBodyAngleX: number; // PARAM_BODY_ANGLE_XのIndex
-        private _parameterIndexEyeX: number;    // PARAM_EYE_BALL_XのIndex
-        private _parameterIndexEyeY: number;    // PARAM_EYE_BALL_YのIndex
-        private _parameterIndexMouthOpenY: number; // PARAM_MOUTH_OPEN_YのIndex
+        private _param_angle_x: number;  // PARAM_ANGLE_XのIndex
+        private _param_angle_y: number;  // PARAM_ANGLE_YのIndex
+        private _param_body_angle_x: number; // PARAM_BODY_ANGLE_XのIndex
+        private _param_eye_ball_x: number;    // PARAM_EYE_BALL_XのIndex
+        private _param_eye_ball_y: number;    // PARAM_EYE_BALL_YのIndex
+        private _param_mouth_open_y: number; // PARAM_MOUTH_OPEN_YのIndex
         private _dragging: boolean = false;
 
-        constructor(app: PIXI.Application, loader: PIXI.loaders.Loader, modelInfo: any,
-            modelId: string, canvasDefine: LIVE2DDEFINE.CANVAS, modelDefine: LIVE2DDEFINE.MODEL){
+        constructor(app: PIXI.Application, loader: PIXI.loaders.Loader, model_info: any,
+            model_id: string, canvas_def: LIVE2DDEFINE.CANVAS, model_def: LIVE2DDEFINE.MODEL){
             this._app = app;
             this._loader = loader;
-            this._modelInfo = modelInfo;
-            this._modelId = modelId;
-            this._canvasDefine = canvasDefine;
-            this._modelDefine = modelDefine;
+            this._model_info = model_info;
+            this._model_id = model_id;
+            this._canvas_def = canvas_def;
+            this._model_def = model_def;
             this.init();
         }
 
@@ -58,39 +58,39 @@ export namespace PIXI_LIVE2D {
         }
 
         loadMoc(){
-            PIXI.loader.add(`Moc_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Moc,
+            PIXI.loader.add(`Moc_${this._canvas_def._id}`, this._model_def._filepath + this._model_info.Moc,
                 { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER });
         }
 
         loadTextures(){
-            for(let i = 0; i < this._modelInfo.Textures.length; i++)
+            for(let i = 0; i < this._model_info.Textures.length; i++)
             {
-                PIXI.loader.add(`Texture${i}_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Textures[i]);
+                PIXI.loader.add(`Texture${i}_${this._canvas_def._id}`, this._model_def._filepath + this._model_info.Textures[i]);
             }
         }
 
         loadMotions(){
-            if(this._modelInfo.Motions !== void 0){
-                for(let i = 0; i < this._modelInfo.Motions.length; i++)
+            if(this._model_info.Motions !== void 0){
+                for(let i = 0; i < this._model_info.Motions.length; i++)
                 {
-                    PIXI.loader.add(`Motion${i}_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Motions[i],
+                    PIXI.loader.add(`Motion${i}_${this._canvas_def._id}`, this._model_def._filepath + this._model_info.Motions[i],
                                     { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
                 }
             }
         }
 
         loadPhysics(){
-            if(this._modelInfo.Physics !== void 0){
-                PIXI.loader.add(`Physics_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Physics,
+            if(this._model_info.Physics !== void 0){
+                PIXI.loader.add(`Physics_${this._canvas_def._id}`, this._model_def._filepath + this._model_info.Physics,
                 { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
             }
         }
 
         loadSounds(){
-            if(this._modelInfo.Sounds !== void 0){
-                for(let i = 0; i < this._modelInfo.Sounds.length; i++)
+            if(this._model_info.Sounds !== void 0){
+                for(let i = 0; i < this._model_info.Sounds.length; i++)
                 {
-                    PIXI.loader.add(`Sound${i}_${this._canvasDefine._id}`, this._modelDefine._filepath + this._modelInfo.Sounds[i],
+                    PIXI.loader.add(`Sound${i}_${this._canvas_def._id}`, this._model_def._filepath + this._model_info.Sounds[i],
                                     { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER });
                 }
             }
@@ -98,28 +98,32 @@ export namespace PIXI_LIVE2D {
 
         loadResources(_resources: PIXI.loaders.ResourceDictionary){
             // Load moc.
-            this._moc = LIVE2DCUBISMCORE.Moc.fromArrayBuffer(_resources[`Moc_${this._canvasDefine._id}`].data);
+            this._moc = LIVE2DCUBISMCORE.Moc.fromArrayBuffer(_resources[`Moc_${this._canvas_def._id}`].data);
             this._modelbuilder = new LIVE2DCUBISMPIXI.ModelBuilder();
             this._modelbuilder.setMoc(this._moc)
                                 .setTimeScale(1);
             // Texture
-            for(let i = 0; i < this._modelInfo.Textures.length; i++)
+            for(let i = 0; i < this._model_info.Textures.length; i++)
             {
-                this._modelbuilder.addTexture(i, _resources[`Texture${i}_${this._canvasDefine._id}`].texture);
+                this._modelbuilder.addTexture(i, _resources[`Texture${i}_${this._canvas_def._id}`].texture);
             }
             // Motion
-            this._modelbuilder.addAnimatorLayer(`Base_${this._canvasDefine._id}`,
+            this._modelbuilder.addAnimatorLayer(`Base_${this._canvas_def._id}`,
                 LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
-            this._modelbuilder.addAnimatorLayer(`Lipsync_${this._canvasDefine._id}`,
+            // Lipsync Motion
+            this._modelbuilder.addAnimatorLayer(`Lipsync_${this._canvas_def._id}`,
+            LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
+            // Drag Motion
+            this._modelbuilder.addAnimatorLayer(`Drag_${this._canvas_def._id}`,
             LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
             // PhySics
-            if(_resources[`Physics_${this._canvasDefine._id}`] !== void 0){
-                this._modelbuilder.setPhysics3Json(_resources[`Physics_${this._canvasDefine._id}`].data);
+            if(_resources[`Physics_${this._canvas_def._id}`] !== void 0){
+                this._modelbuilder.setPhysics3Json(_resources[`Physics_${this._canvas_def._id}`].data);
             }
             // Sounds
-            if(this._modelInfo.Sounds !== void 0){
-                for(let i = 0; i < this._modelInfo.Sounds.length; i++){
-                    this._sounds[i] = new LIVE2DSOUND.Sound(_resources[`Sound${i}_${this._canvasDefine._id}`].data);
+            if(this._model_info.Sounds !== void 0){
+                for(let i = 0; i < this._model_info.Sounds.length; i++){
+                    this._sounds[i] = new LIVE2DSOUND.Sound(_resources[`Sound${i}_${this._canvas_def._id}`].data);
                 }
             }
 
@@ -132,21 +136,21 @@ export namespace PIXI_LIVE2D {
         loadAnimations(_resources: PIXI.loaders.ResourceDictionary){
             // Load animation.
             this._animations = [];
-            if(this._modelInfo.Motions !== void 0){
-                for(let i = 0; i < this._modelInfo.Motions.length; i++)
+            if(this._model_info.Motions !== void 0){
+                for(let i = 0; i < this._model_info.Motions.length; i++)
                 {
                     this._animations[i] =
-                        LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(_resources[`Motion${i}_${this._canvasDefine._id}`].data);
+                        LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(_resources[`Motion${i}_${this._canvas_def._id}`].data);
                 }
             }
         }
 
         onDragEvent(){
-            this._parameterIndexAngleX = this._model.parameters.ids.indexOf("PARAM_ANGLE_X");
-            this._parameterIndexAngleY = this._model.parameters.ids.indexOf("PARAM_ANGLE_Y");
-            this._parameterIndexBodyAngleX = this._model.parameters.ids.indexOf("PARAM_BODY_ANGLE_X");
-            this._parameterIndexEyeX = this._model.parameters.ids.indexOf("PARAM_EYE_BALL_X");
-            this._parameterIndexEyeY = this._model.parameters.ids.indexOf("PARAM_EYE_BALL_Y");
+            this._param_angle_x = this._model.parameters.ids.indexOf("PARAM_ANGLE_X");
+            this._param_angle_y = this._model.parameters.ids.indexOf("PARAM_ANGLE_Y");
+            this._param_body_angle_x = this._model.parameters.ids.indexOf("PARAM_BODY_ANGLE_X");
+            this._param_eye_ball_x = this._model.parameters.ids.indexOf("PARAM_EYE_BALL_X");
+            this._param_eye_ball_y = this._model.parameters.ids.indexOf("PARAM_EYE_BALL_Y");
 
             this._app.view.addEventListener('pointerdown', this._onDragStart.bind(this), false);
             this._app.view.addEventListener('pointerup', this._onDragEnd.bind(this), false);
@@ -173,7 +177,7 @@ export namespace PIXI_LIVE2D {
                 // マウス座標を-1.0〜1.0に正規化
                 let height = this._app.screen.height / 2;
                 let width = this._app.screen.width / 2;
-                let scale = 1.0 - (height / this._canvasDefine._scale);
+                let scale = 1.0 - (height / this._canvas_def._scale);
                 this._pos_x = - this._mouse_x / height;
                 // Yは頭の位置分を調整
                 this._pos_y = - (this._mouse_y / width) + scale;
@@ -183,27 +187,27 @@ export namespace PIXI_LIVE2D {
 
         playAnimation(i: number){
             // Play animation.
-            this._model.animator.getLayer(`Base_${this._canvasDefine._id}`).play(this._animations[i]);
+            this._model.animator.getLayer(`Base_${this._canvas_def._id}`).play(this._animations[i]);
         }
 
         playLipsync(){
             this._animations[0].evaluate = (time, weight, blend, target) => {
-                this._parameterIndexMouthOpenY = target.parameters.ids.indexOf("PARAM_MOUTH_OPEN_Y");
-                if (this._parameterIndexMouthOpenY >= 0) {
+                this._param_mouth_open_y = target.parameters.ids.indexOf("PARAM_MOUTH_OPEN_Y");
+                if (this._param_mouth_open_y >= 0) {
                     const sample = (Math.sin(time*9.543)+1 + Math.sin(time*13.831))/2;
-                    target.parameters.values[this._parameterIndexMouthOpenY] =
-                    blend(target.parameters.values[this._parameterIndexMouthOpenY], sample, weight);
+                    target.parameters.values[this._param_mouth_open_y] =
+                    blend(target.parameters.values[this._param_mouth_open_y], sample, weight);
                 }
             }
-            this._model.animator.getLayer(`Lipsync_${this._canvasDefine._id}`).play(this._animations[0]);
+            this._model.animator.getLayer(`Lipsync_${this._canvas_def._id}`).play(this._animations[0]);
         }
 
         stopAnimation(){
-            this._model.animator.getLayer(`Base_${this._canvasDefine._id}`).stop();
+            this._model.animator.getLayer(`Base_${this._canvas_def._id}`).stop();
         }
 
         setLoop(loop : boolean){
-            this._model.animator.getLayer(`Base_${this._canvasDefine._id}`).currentAnimation.loop = loop;
+            this._model.animator.getLayer(`Base_${this._canvas_def._id}`).currentAnimation.loop = loop;
         }
 
         playSound(i: number){
@@ -228,29 +232,43 @@ export namespace PIXI_LIVE2D {
         }
 
         _updateParameter(){
-            if(this._parameterIndexAngleX >= 0){
-                this._model.parameters.values[this._parameterIndexAngleX] = this._pos_x * 30;
+            this._animations[0].evaluate = (time, weight, blend, target) => {
+                // angle_x
+                if (this._param_angle_x >= 0) {
+                    target.parameters.values[this._param_angle_x] =
+                    blend(target.parameters.values[this._param_angle_x], this._pos_x * 30, weight);
+                }
+                // angle_y
+                if (this._param_angle_y >= 0) {
+                    target.parameters.values[this._param_angle_y] =
+                    blend(target.parameters.values[this._param_angle_y], -this._pos_y * 30, weight);
+                }
+                // body_angle_x
+                if (this._param_body_angle_x >= 0) {
+                    target.parameters.values[this._param_body_angle_x] =
+                    blend(target.parameters.values[this._param_body_angle_x], this._pos_x * 10, weight);
+                }
+                // eye_ball_x
+                if (this._param_eye_ball_x >= 0) {
+                    target.parameters.values[this._param_eye_ball_x] =
+                    blend(target.parameters.values[this._param_eye_ball_x], this._pos_x, weight);
+                }
+                // eye_ball_y
+                if (this._param_eye_ball_y >= 0) {
+                    target.parameters.values[this._param_eye_ball_y] =
+                    blend(target.parameters.values[this._param_eye_ball_y], -this._pos_y, weight);
+                }
             }
-            if(this._parameterIndexAngleY >= 0){
-                this._model.parameters.values[this._parameterIndexAngleY] = -this._pos_y * 30;
-            }
-            if(this._parameterIndexBodyAngleX >= 0){
-                this._model.parameters.values[this._parameterIndexBodyAngleX] = this._pos_x * 10;
-            }
-            if(this._parameterIndexEyeX >= 0){
-                this._model.parameters.values[this._parameterIndexEyeX] = this._pos_x;
-            }
-            if(this._parameterIndexEyeY >= 0){
-                this._model.parameters.values[this._parameterIndexEyeY] = -this._pos_y;
-            }
+
+            this._model.animator.getLayer(`Drag_${this._canvas_def._id}`).play(this._animations[0]);
         }
 
         changeBlend(i: number){
             if(i % 2 == 0){
-                this._model.animator.getLayer(`Base_${this._canvasDefine._id}`).blend =
+                this._model.animator.getLayer(`Base_${this._canvas_def._id}`).blend =
                 LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.ADD;
             }else{
-                this._model.animator.getLayer(`Base_${this._canvasDefine._id}`).blend =
+                this._model.animator.getLayer(`Base_${this._canvas_def._id}`).blend =
                 LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE;
             }
         }
@@ -268,13 +286,13 @@ export namespace PIXI_LIVE2D {
             console.log(this._app.ticker.FPS);
         }
 
-        rePosition(positionX: number = this._canvasDefine._x,
-            positionY: number = this._canvasDefine._y,
-            scale: number = this._canvasDefine._scale)
+        rePosition(positionX: number = this._canvas_def._x,
+            positionY: number = this._canvas_def._y,
+            scale: number = this._canvas_def._scale)
         {
-            this._canvasDefine._x = positionX;
-            this._canvasDefine._y = positionY;
-            this._canvasDefine._scale = scale;
+            this._canvas_def._x = positionX;
+            this._canvas_def._y = positionY;
+            this._canvas_def._scale = scale;
             // Resize model.
             this._model.position = new PIXI.Point(positionX, positionY);
             this._model.scale = new PIXI.Point(scale, scale);
@@ -282,8 +300,8 @@ export namespace PIXI_LIVE2D {
         }
 
         resize(){
-            let width = this._canvasDefine._width;
-            let height = this._canvasDefine._height;
+            let width = this._canvas_def._width;
+            let height = this._canvas_def._height;
             // Resize app.
             this._app.view.style.width = `${width}px`;
             this._app.view.style.height = `${height}px`;
