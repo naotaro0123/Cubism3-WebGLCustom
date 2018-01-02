@@ -10,7 +10,8 @@ export namespace PIXI_LIVE2D {
         private _model_def: LIVE2DDEFINE.MODEL;
         private _moc: any;
         private _modelbuilder: LIVE2DCUBISMPIXI.ModelBuilder;
-        private _animations: LIVE2DCUBISMFRAMEWORK.Animation[];
+        private _animations: LIVE2DCUBISMFRAMEWORK.Animation[] = [];
+        private _emptyanims: LIVE2DCUBISMFRAMEWORK.Animation[] = [];
         private _sounds: LIVE2DSOUND.Sound[] = [];
         private _model: LIVE2DCUBISMPIXI.Model;
         private _model_id: string;
@@ -70,6 +71,10 @@ export namespace PIXI_LIVE2D {
         }
 
         loadMotions(){
+            // Drag追従とLipSync用の空モーションをロード
+            PIXI.loader.add(`Empty_${this._canvas_def._id}`, this._model_def._commonpath + this._model_def._emptymotion,
+            { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
+
             if(this._model_info.Motions !== void 0){
                 for(let i = 0; i < this._model_info.Motions.length; i++)
                 {
@@ -134,8 +139,14 @@ export namespace PIXI_LIVE2D {
         }
 
         loadAnimations(_resources: PIXI.loaders.ResourceDictionary){
+
+            for(let k = 0; k < 2; k++)
+            {
+                this._emptyanims[k] =
+                LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(_resources[`Empty_${this._canvas_def._id}`].data);
+            }
+
             // Load animation.
-            this._animations = [];
             if(this._model_info.Motions !== void 0){
                 for(let i = 0; i < this._model_info.Motions.length; i++)
                 {
@@ -191,7 +202,7 @@ export namespace PIXI_LIVE2D {
         }
 
         playLipsync(){
-            this._animations[0].evaluate = (time, weight, blend, target) => {
+            this._emptyanims[0].evaluate = (time, weight, blend, target) => {
                 this._param_mouth_open_y = target.parameters.ids.indexOf("PARAM_MOUTH_OPEN_Y");
                 if (this._param_mouth_open_y >= 0) {
                     const sample = (Math.sin(time*9.543)+1 + Math.sin(time*13.831))/2;
@@ -199,7 +210,7 @@ export namespace PIXI_LIVE2D {
                     blend(target.parameters.values[this._param_mouth_open_y], sample, weight);
                 }
             }
-            this._model.animator.getLayer(`Lipsync_${this._canvas_def._id}`).play(this._animations[0]);
+            this._model.animator.getLayer(`Lipsync_${this._canvas_def._id}`).play(this._emptyanims[0]);
         }
 
         stopAnimation(){
@@ -232,7 +243,7 @@ export namespace PIXI_LIVE2D {
         }
 
         _updateParameter(){
-            this._animations[0].evaluate = (time, weight, blend, target) => {
+            this._emptyanims[1].evaluate = (time, weight, blend, target) => {
                 // angle_x
                 if (this._param_angle_x >= 0) {
                     target.parameters.values[this._param_angle_x] =
@@ -260,7 +271,7 @@ export namespace PIXI_LIVE2D {
                 }
             }
 
-            this._model.animator.getLayer(`Drag_${this._canvas_def._id}`).play(this._animations[0]);
+            this._model.animator.getLayer(`Drag_${this._canvas_def._id}`).play(this._emptyanims[1]);
         }
 
         changeBlend(i: number){

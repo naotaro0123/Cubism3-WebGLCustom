@@ -36,6 +36,8 @@ var LIVE2DDEFINE;
         LIVE2DDEFINE.MODELS_DEFINE[name].Model = new MODEL();
         LIVE2DDEFINE.MODELS_DEFINE[name].Canvas = new CANVAS();
         LIVE2DDEFINE.MODELS_DEFINE[name].Canvas._id = "glcanvas_" + name + "_" + i;
+        LIVE2DDEFINE.MODELS_DEFINE[name].Model._commonpath = "../assets/common/";
+        LIVE2DDEFINE.MODELS_DEFINE[name].Model._emptymotion = "empty.motion3.json";
         LIVE2DDEFINE.MODELS_DEFINE[name].Model._filepath = "../assets/" + name + "/";
         LIVE2DDEFINE.MODELS_DEFINE[name].Model._modeljson = name + ".model3.json";
     }
@@ -165,6 +167,8 @@ var PIXI_LIVE2D;
 (function (PIXI_LIVE2D) {
     var Live2DPixiModel = (function () {
         function Live2DPixiModel(app, loader, model_info, model_id, canvas_def, model_def) {
+            this._animations = [];
+            this._emptyanims = [];
             this._sounds = [];
             this._mouse_x = 0;
             this._mouse_y = 0;
@@ -206,6 +210,7 @@ var PIXI_LIVE2D;
             }
         };
         Live2DPixiModel.prototype.loadMotions = function () {
+            PIXI.loader.add("Empty_" + this._canvas_def._id, this._model_def._commonpath + this._model_def._emptymotion, { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
             if (this._model_info.Motions !== void 0) {
                 for (var i = 0; i < this._model_info.Motions.length; i++) {
                     PIXI.loader.add("Motion" + i + "_" + this._canvas_def._id, this._model_def._filepath + this._model_info.Motions[i], { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
@@ -248,7 +253,10 @@ var PIXI_LIVE2D;
             this._app.stage.addChild(this._model.masks);
         };
         Live2DPixiModel.prototype.loadAnimations = function (_resources) {
-            this._animations = [];
+            for (var k = 0; k < 2; k++) {
+                this._emptyanims[k] =
+                    LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(_resources["Empty_" + this._canvas_def._id].data);
+            }
             if (this._model_info.Motions !== void 0) {
                 for (var i = 0; i < this._model_info.Motions.length; i++) {
                     this._animations[i] =
@@ -289,7 +297,7 @@ var PIXI_LIVE2D;
         };
         Live2DPixiModel.prototype.playLipsync = function () {
             var _this = this;
-            this._animations[0].evaluate = function (time, weight, blend, target) {
+            this._emptyanims[0].evaluate = function (time, weight, blend, target) {
                 _this._param_mouth_open_y = target.parameters.ids.indexOf("PARAM_MOUTH_OPEN_Y");
                 if (_this._param_mouth_open_y >= 0) {
                     var sample = (Math.sin(time * 9.543) + 1 + Math.sin(time * 13.831)) / 2;
@@ -297,7 +305,7 @@ var PIXI_LIVE2D;
                         blend(target.parameters.values[_this._param_mouth_open_y], sample, weight);
                 }
             };
-            this._model.animator.getLayer("Lipsync_" + this._canvas_def._id).play(this._animations[0]);
+            this._model.animator.getLayer("Lipsync_" + this._canvas_def._id).play(this._emptyanims[0]);
         };
         Live2DPixiModel.prototype.stopAnimation = function () {
             this._model.animator.getLayer("Base_" + this._canvas_def._id).stop();
@@ -323,7 +331,7 @@ var PIXI_LIVE2D;
         };
         Live2DPixiModel.prototype._updateParameter = function () {
             var _this = this;
-            this._animations[0].evaluate = function (time, weight, blend, target) {
+            this._emptyanims[1].evaluate = function (time, weight, blend, target) {
                 if (_this._param_angle_x >= 0) {
                     target.parameters.values[_this._param_angle_x] =
                         blend(target.parameters.values[_this._param_angle_x], _this._pos_x * 30, weight);
@@ -345,7 +353,7 @@ var PIXI_LIVE2D;
                         blend(target.parameters.values[_this._param_eye_ball_y], -_this._pos_y, weight);
                 }
             };
-            this._model.animator.getLayer("Drag_" + this._canvas_def._id).play(this._animations[0]);
+            this._model.animator.getLayer("Drag_" + this._canvas_def._id).play(this._emptyanims[1]);
         };
         Live2DPixiModel.prototype.changeBlend = function (i) {
             if (i % 2 == 0) {

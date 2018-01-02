@@ -8,6 +8,8 @@ export namespace LIVE2DDEFINE
 
     export class MODEL
     {
+        _commonpath: string;
+        _emptymotion: string;
         _filepath: string;
         _modeljson: string;
     }
@@ -35,6 +37,8 @@ export namespace LIVE2DDEFINE
         MODELS_DEFINE[name].Model = new MODEL();
         MODELS_DEFINE[name].Canvas = new CANVAS();
         MODELS_DEFINE[name].Canvas._id = `glcanvas_${name}_${i}`;
+        MODELS_DEFINE[name].Model._commonpath = `../assets/common/`;
+        MODELS_DEFINE[name].Model._emptymotion = `empty.motion3.json`;
         MODELS_DEFINE[name].Model._filepath = `../assets/${name}/`;
         MODELS_DEFINE[name].Model._modeljson = `${name}.model3.json`;
     }

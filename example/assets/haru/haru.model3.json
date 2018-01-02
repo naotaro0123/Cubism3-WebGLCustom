@@ -8,7 +8,6 @@
             "haru.1024/texture_02.png"
         ],
         "Motions": [
-            "motions/empty.motion3.json",
             "motions/haru_idle_01.motion3.json",
             "motions/haru_idle_02.motion3.json",
             "motions/haru_idle_03.motion3.json",
