@@ -47,9 +47,11 @@ var LIVE2DAUDIO;
             this._audioCanvasCtx.fillRect(0, 0, this._audioCanvas.width, this._audioCanvas.height);
             var barWidth = 0;
             var barHeight = (this._audioCanvas.width / this._bufferLengthAlt) * 150.0;
+            var maxValue = 0;
             for (var i = 0; i < this._bufferLengthAlt; i++) {
                 barWidth = this._dataArrayAlt[i];
-                this._volume = barWidth / 255;
+                maxValue = maxValue > barWidth ? maxValue : barWidth;
+                this._volume = maxValue / 255;
                 this._audioCanvasCtx.fillStyle = 'rgb(' + (barWidth + 100) + ',50, 50)';
                 this._audioCanvasCtx.fillRect(0, 0, barWidth, barHeight);
             }

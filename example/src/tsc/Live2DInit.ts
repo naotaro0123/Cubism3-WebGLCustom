@@ -1,4 +1,5 @@
 import { LIVE2DDEFINE } from './Define';
+import { LIVE2DAUDIO } from './Audio';
 import { PIXI_LIVE2D } from './Live2DPixiModel';
 
 
@@ -9,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let app: PIXI.Application;
     let Live2d_no: number = 0;
     let Live2d_canvas: any = [];
+    let webAudio: LIVE2DAUDIO.Audio;
 
     init(Live2d_no);
 
@@ -19,6 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
         app = new PIXI.Application(model_def[i].Canvas._width,
             model_def[i].Canvas._height, {transparent: true});
         app.view.id = model_def[i].Canvas._id;
+        // Audiosクラス生成
+        webAudio = new LIVE2DAUDIO.Audio();
 
         PIXI.loader.add(`ModelJson_${model_def[i].Canvas._id}`, model_def[i].Model._filepath + model_def[i].Model._modeljson,
             { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
@@ -26,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
             model_info = resources[`ModelJson_${model_def[i].Canvas._id}`].data.FileReferences;
 
             Live2d_canvas[i] = new PIXI_LIVE2D.Live2DPixiModel(
-                app, loader, model_info, model_id[i], model_def[i].Canvas, model_def[i].Model);
+                app, loader, webAudio, model_info, model_id[i], model_def[i].Canvas, model_def[i].Model);
 
             document.body.appendChild(app.view);
         });
@@ -108,6 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let audioCnt : number = 0;
     // 音声切り替え
     document.getElementById("changeAudio").addEventListener("click", () => {
+        if(model_info.Audios == void 0)return;
         audioCnt++;
         if(audioCnt >= model_info.Audios.length){
             audioCnt = 0;

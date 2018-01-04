@@ -29,10 +29,12 @@ export namespace PIXI_LIVE2D {
         private _dragging: boolean = false;
 
 
-        constructor(app: PIXI.Application, loader: PIXI.loaders.Loader, model_info: any,
-            model_id: string, canvas_def: LIVE2DDEFINE.CANVAS, model_def: LIVE2DDEFINE.MODEL){
+        constructor(app: PIXI.Application, loader: PIXI.loaders.Loader, webAudio: LIVE2DAUDIO.Audio,
+            model_info: any, model_id: string, canvas_def: LIVE2DDEFINE.CANVAS,
+            model_def: LIVE2DDEFINE.MODEL){
             this._app = app;
             this._loader = loader;
+            this._webAudio = webAudio;
             this._model_info = model_info;
             this._model_id = model_id;
             this._canvas_def = canvas_def;
@@ -53,6 +55,7 @@ export namespace PIXI_LIVE2D {
                 this.playAnimation(0);
                 this.rePosition();
                 this.onDragEvent();
+                this.playLipsync();
 
                 this.resize();
                 window.onresize = this.resize;
@@ -100,9 +103,6 @@ export namespace PIXI_LIVE2D {
 
         loadAudios(){
             if(this._model_info.Audios !== void 0){
-                // Audiosクラス生成
-                this._webAudio = new LIVE2DAUDIO.Audio();
-
                 for(let i = 0; i < this._model_info.Audios.length; i++)
                 {
                     this._webAudio.setAudio(i, this._model_def._filepath + this._model_info.Audios[i]);
@@ -216,9 +216,8 @@ export namespace PIXI_LIVE2D {
             this._emptyanims[0].evaluate = (time, weight, blend, target) => {
                 this._param_mouth_open_y = target.parameters.ids.indexOf("PARAM_MOUTH_OPEN_Y");
                 if (this._param_mouth_open_y >= 0) {
-                    const sample = (Math.sin(time*9.543)+1 + Math.sin(time*13.831))/2;
-                    // const sample = this._webAudio.getVolume();
-                    // console.log(`sample: ${sample}`);
+                    // const sample = (Math.sin(time*9.543)+1 + Math.sin(time*13.831))/2;
+                    const sample = this._webAudio.getVolume();
                     target.parameters.values[this._param_mouth_open_y] =
                     blend(target.parameters.values[this._param_mouth_open_y], sample, weight);
                 }
@@ -229,7 +228,6 @@ export namespace PIXI_LIVE2D {
 
         stopLipsync(){
             this._model.animator.getLayer(`Lipsync_${this._canvas_def._id}`).stop();
-            // this._webAudio.stop();
         }
 
 
@@ -262,8 +260,6 @@ export namespace PIXI_LIVE2D {
 
                 // 音声をビジュアライズする
                 this._webAudio.visuaLize();
-                // const sample = this._webAudio.getVolume();
-                // console.log(`sample: ${sample}`);
 
                 this._model.update(deltaTime);
                 this._model.masks.update(this._app.renderer);

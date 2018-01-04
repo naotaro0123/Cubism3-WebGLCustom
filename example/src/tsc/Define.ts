@@ -20,8 +20,8 @@ export namespace LIVE2DDEFINE
         _width: number = 400;
         _height: number = 400;
         _x: number = 200;
-        _y: number = 300;
-        _scale: number = 400;
+        _y: number = 400;
+        _scale: number = 600;
     }
 
     export const MODELS_DEFINE : any = {};

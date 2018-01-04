@@ -75,12 +75,15 @@ export namespace LIVE2DAUDIO
 
             let barWidth = 0;
             let barHeight = (this._audioCanvas.width / this._bufferLengthAlt) * 150.0;
+            let maxValue = 0;
 
             for (let i = 0; i < this._bufferLengthAlt; i++) {
                 barWidth = this._dataArrayAlt[i]; // 波形データ 0 ~ 255が格納されている
+
+                maxValue = maxValue > barWidth ? maxValue: barWidth;
                 // Live2Dに渡すには0.0〜1.0に正規化
                 // console.log(barWidth / 255);
-                this._volume = barWidth / 255;
+                this._volume = maxValue / 255;
 
                 this._audioCanvasCtx.fillStyle = 'rgb(' + (barWidth + 100) + ',50, 50)';
                 this._audioCanvasCtx.fillRect(0, 0, barWidth, barHeight);

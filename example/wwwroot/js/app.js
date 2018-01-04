@@ -48,9 +48,11 @@ var LIVE2DAUDIO;
             this._audioCanvasCtx.fillRect(0, 0, this._audioCanvas.width, this._audioCanvas.height);
             var barWidth = 0;
             var barHeight = (this._audioCanvas.width / this._bufferLengthAlt) * 150.0;
+            var maxValue = 0;
             for (var i = 0; i < this._bufferLengthAlt; i++) {
                 barWidth = this._dataArrayAlt[i];
-                this._volume = barWidth / 255;
+                maxValue = maxValue > barWidth ? maxValue : barWidth;
+                this._volume = maxValue / 255;
                 this._audioCanvasCtx.fillStyle = 'rgb(' + (barWidth + 100) + ',50, 50)';
                 this._audioCanvasCtx.fillRect(0, 0, barWidth, barHeight);
             }
@@ -89,8 +91,8 @@ var LIVE2DDEFINE;
             this._width = 400;
             this._height = 400;
             this._x = 200;
-            this._y = 300;
-            this._scale = 400;
+            this._y = 400;
+            this._scale = 600;
         }
         return CANVAS;
     }());
@@ -124,6 +126,7 @@ var LIVE2DDEFINE;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Define_1 = require("./Define");
+var Audio_1 = require("./Audio");
 var Live2DPixiModel_1 = require("./Live2DPixiModel");
 document.addEventListener("DOMContentLoaded", function () {
     var model_id = [];
@@ -132,6 +135,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var app;
     var Live2d_no = 0;
     var Live2d_canvas = [];
+    var webAudio;
     init(Live2d_no);
     function init(i) {
         if (i === void 0) { i = 0; }
@@ -139,10 +143,11 @@ document.addEventListener("DOMContentLoaded", function () {
         model_def[i] = Define_1.LIVE2DDEFINE.MODELS_DEFINE[model_id[i]];
         app = new PIXI.Application(model_def[i].Canvas._width, model_def[i].Canvas._height, { transparent: true });
         app.view.id = model_def[i].Canvas._id;
+        webAudio = new Audio_1.LIVE2DAUDIO.Audio();
         PIXI.loader.add("ModelJson_" + model_def[i].Canvas._id, model_def[i].Model._filepath + model_def[i].Model._modeljson, { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
         PIXI.loader.load(function (loader, resources) {
             model_info = resources["ModelJson_" + model_def[i].Canvas._id].data.FileReferences;
-            Live2d_canvas[i] = new Live2DPixiModel_1.PIXI_LIVE2D.Live2DPixiModel(app, loader, model_info, model_id[i], model_def[i].Canvas, model_def[i].Model);
+            Live2d_canvas[i] = new Live2DPixiModel_1.PIXI_LIVE2D.Live2DPixiModel(app, loader, webAudio, model_info, model_id[i], model_def[i].Canvas, model_def[i].Model);
             document.body.appendChild(app.view);
         });
     }
@@ -198,6 +203,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }, false);
     var audioCnt = 0;
     document.getElementById("changeAudio").addEventListener("click", function () {
+        if (model_info.Audios == void 0)
+            return;
         audioCnt++;
         if (audioCnt >= model_info.Audios.length) {
             audioCnt = 0;
@@ -220,14 +227,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-},{"./Define":2,"./Live2DPixiModel":4}],4:[function(require,module,exports){
+},{"./Audio":1,"./Define":2,"./Live2DPixiModel":4}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var Audio_1 = require("./Audio");
 var PIXI_LIVE2D;
 (function (PIXI_LIVE2D) {
     var Live2DPixiModel = (function () {
-        function Live2DPixiModel(app, loader, model_info, model_id, canvas_def, model_def) {
+        function Live2DPixiModel(app, loader, webAudio, model_info, model_id, canvas_def, model_def) {
             this._animations = [];
             this._emptyanims = [];
             this._mouse_x = 0;
@@ -237,6 +243,7 @@ var PIXI_LIVE2D;
             this._dragging = false;
             this._app = app;
             this._loader = loader;
+            this._webAudio = webAudio;
             this._model_info = model_info;
             this._model_id = model_id;
             this._canvas_def = canvas_def;
@@ -256,6 +263,7 @@ var PIXI_LIVE2D;
                 _this.playAnimation(0);
                 _this.rePosition();
                 _this.onDragEvent();
+                _this.playLipsync();
                 _this.resize();
                 window.onresize = _this.resize;
                 _this.tick();
@@ -284,7 +292,6 @@ var PIXI_LIVE2D;
         };
         Live2DPixiModel.prototype.loadAudios = function () {
             if (this._model_info.Audios !== void 0) {
-                this._webAudio = new Audio_1.LIVE2DAUDIO.Audio();
                 for (var i = 0; i < this._model_info.Audios.length; i++) {
                     this._webAudio.setAudio(i, this._model_def._filepath + this._model_info.Audios[i]);
                 }
@@ -356,7 +363,7 @@ var PIXI_LIVE2D;
             this._emptyanims[0].evaluate = function (time, weight, blend, target) {
                 _this._param_mouth_open_y = target.parameters.ids.indexOf("PARAM_MOUTH_OPEN_Y");
                 if (_this._param_mouth_open_y >= 0) {
-                    var sample = (Math.sin(time * 9.543) + 1 + Math.sin(time * 13.831)) / 2;
+                    var sample = _this._webAudio.getVolume();
                     target.parameters.values[_this._param_mouth_open_y] =
                         blend(target.parameters.values[_this._param_mouth_open_y], sample, weight);
                 }
@@ -464,4 +471,4 @@ var PIXI_LIVE2D;
     PIXI_LIVE2D.Live2DPixiModel = Live2DPixiModel;
 })(PIXI_LIVE2D = exports.PIXI_LIVE2D || (exports.PIXI_LIVE2D = {}));
 
-},{"./Audio":1}]},{},[2,3,4]);
+},{}]},{},[2,3,4]);
