@@ -1,5 +1,5 @@
 import { LIVE2DDEFINE } from './Define';
-import { LIVE2DSOUND } from './Sound';
+import { LIVE2DAUDIO } from './Audio';
 
 
 export namespace PIXI_LIVE2D {
@@ -12,7 +12,7 @@ export namespace PIXI_LIVE2D {
         private _modelbuilder: LIVE2DCUBISMPIXI.ModelBuilder;
         private _animations: LIVE2DCUBISMFRAMEWORK.Animation[] = [];
         private _emptyanims: LIVE2DCUBISMFRAMEWORK.Animation[] = [];
-        private _sounds: LIVE2DSOUND.Sound[] = [];
+        private _webAudio: LIVE2DAUDIO.Audio;
         private _model: LIVE2DCUBISMPIXI.Model;
         private _model_id: string;
         private _loader: PIXI.loaders.Loader;
@@ -28,6 +28,7 @@ export namespace PIXI_LIVE2D {
         private _param_mouth_open_y: number; // PARAM_MOUTH_OPEN_YのIndex
         private _dragging: boolean = false;
 
+
         constructor(app: PIXI.Application, loader: PIXI.loaders.Loader, model_info: any,
             model_id: string, canvas_def: LIVE2DDEFINE.CANVAS, model_def: LIVE2DDEFINE.MODEL){
             this._app = app;
@@ -39,12 +40,13 @@ export namespace PIXI_LIVE2D {
             this.init();
         }
 
+
         init(){
             this.loadMoc();
             this.loadTextures();
             this.loadMotions();
             this.loadPhysics();
-            this.loadSounds();
+            this.loadAudios();
             PIXI.loader.load((loader: PIXI.loaders.Loader, resources: PIXI.loaders.ResourceDictionary) => {
                 this.loadResources(resources);
                 this.loadAnimations(resources);
@@ -58,10 +60,12 @@ export namespace PIXI_LIVE2D {
             });
         }
 
+
         loadMoc(){
             PIXI.loader.add(`Moc_${this._canvas_def._id}`, this._model_def._filepath + this._model_info.Moc,
                 { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER });
         }
+
 
         loadTextures(){
             for(let i = 0; i < this._model_info.Textures.length; i++)
@@ -69,6 +73,7 @@ export namespace PIXI_LIVE2D {
                 PIXI.loader.add(`Texture${i}_${this._canvas_def._id}`, this._model_def._filepath + this._model_info.Textures[i]);
             }
         }
+
 
         loadMotions(){
             // Drag追従とLipSync用の空モーションをロード
@@ -84,6 +89,7 @@ export namespace PIXI_LIVE2D {
             }
         }
 
+
         loadPhysics(){
             if(this._model_info.Physics !== void 0){
                 PIXI.loader.add(`Physics_${this._canvas_def._id}`, this._model_def._filepath + this._model_info.Physics,
@@ -91,15 +97,19 @@ export namespace PIXI_LIVE2D {
             }
         }
 
-        loadSounds(){
-            if(this._model_info.Sounds !== void 0){
-                for(let i = 0; i < this._model_info.Sounds.length; i++)
+
+        loadAudios(){
+            if(this._model_info.Audios !== void 0){
+                // Audiosクラス生成
+                this._webAudio = new LIVE2DAUDIO.Audio();
+
+                for(let i = 0; i < this._model_info.Audios.length; i++)
                 {
-                    PIXI.loader.add(`Sound${i}_${this._canvas_def._id}`, this._model_def._filepath + this._model_info.Sounds[i],
-                                    { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER });
+                    this._webAudio.setAudio(i, this._model_def._filepath + this._model_info.Audios[i]);
                 }
             }
         }
+
 
         loadResources(_resources: PIXI.loaders.ResourceDictionary){
             // Load moc.
@@ -125,18 +135,13 @@ export namespace PIXI_LIVE2D {
             if(_resources[`Physics_${this._canvas_def._id}`] !== void 0){
                 this._modelbuilder.setPhysics3Json(_resources[`Physics_${this._canvas_def._id}`].data);
             }
-            // Sounds
-            if(this._model_info.Sounds !== void 0){
-                for(let i = 0; i < this._model_info.Sounds.length; i++){
-                    this._sounds[i] = new LIVE2DSOUND.Sound(_resources[`Sound${i}_${this._canvas_def._id}`].data);
-                }
-            }
 
             this._model = this._modelbuilder.build();
             // Add model to stage.
             this._app.stage.addChild(this._model);
             this._app.stage.addChild(this._model.masks);
         }
+
 
         loadAnimations(_resources: PIXI.loaders.ResourceDictionary){
 
@@ -156,6 +161,7 @@ export namespace PIXI_LIVE2D {
             }
         }
 
+
         onDragEvent(){
             this._param_angle_x = this._model.parameters.ids.indexOf("PARAM_ANGLE_X");
             this._param_angle_y = this._model.parameters.ids.indexOf("PARAM_ANGLE_Y");
@@ -169,15 +175,18 @@ export namespace PIXI_LIVE2D {
             this._app.view.addEventListener('pointermove', this._onDragMove.bind(this), false);
         }
 
+
         _onDragStart(event: any){
             this._dragging = true;
         }
+
 
         _onDragEnd(event: any){
             this._dragging = false;
             this._pos_x = 0.0;
             this._pos_y = 0.0;
         }
+
 
         _onDragMove(event: any){
             // if(this._dragging){
@@ -196,16 +205,20 @@ export namespace PIXI_LIVE2D {
             // }
         }
 
+
         playAnimation(i: number){
             // Play animation.
             this._model.animator.getLayer(`Base_${this._canvas_def._id}`).play(this._animations[i]);
         }
+
 
         playLipsync(){
             this._emptyanims[0].evaluate = (time, weight, blend, target) => {
                 this._param_mouth_open_y = target.parameters.ids.indexOf("PARAM_MOUTH_OPEN_Y");
                 if (this._param_mouth_open_y >= 0) {
                     const sample = (Math.sin(time*9.543)+1 + Math.sin(time*13.831))/2;
+                    // const sample = this._webAudio.getVolume();
+                    // console.log(`sample: ${sample}`);
                     target.parameters.values[this._param_mouth_open_y] =
                     blend(target.parameters.values[this._param_mouth_open_y], sample, weight);
                 }
@@ -213,21 +226,32 @@ export namespace PIXI_LIVE2D {
             this._model.animator.getLayer(`Lipsync_${this._canvas_def._id}`).play(this._emptyanims[0]);
         }
 
+
+        stopLipsync(){
+            this._model.animator.getLayer(`Lipsync_${this._canvas_def._id}`).stop();
+            // this._webAudio.stop();
+        }
+
+
         stopAnimation(){
             this._model.animator.getLayer(`Base_${this._canvas_def._id}`).stop();
         }
 
-        setLoop(loop : boolean){
+
+        setLoop(loop: boolean){
             this._model.animator.getLayer(`Base_${this._canvas_def._id}`).currentAnimation.loop = loop;
         }
 
-        playSound(i: number){
-            this._sounds[i].play();
+
+        playAudio(audioCnt: number){
+            this._webAudio.play(audioCnt);
         }
 
-        stopSound(i: number){
-            this._sounds[i].stop();
+
+        stopAudio(){
+            this._webAudio.stop();
         }
+
 
         tick(){
             // Set up ticker.
@@ -236,11 +260,17 @@ export namespace PIXI_LIVE2D {
                 this.rePosition();
                 this._updateParameter();
 
+                // 音声をビジュアライズする
+                this._webAudio.visuaLize();
+                // const sample = this._webAudio.getVolume();
+                // console.log(`sample: ${sample}`);
+
                 this._model.update(deltaTime);
                 this._model.masks.update(this._app.renderer);
 
             });
         }
+
 
         _updateParameter(){
             this._emptyanims[1].evaluate = (time, weight, blend, target) => {
@@ -274,6 +304,7 @@ export namespace PIXI_LIVE2D {
             this._model.animator.getLayer(`Drag_${this._canvas_def._id}`).play(this._emptyanims[1]);
         }
 
+
         changeBlend(i: number){
             if(i % 2 == 0){
                 this._model.animator.getLayer(`Base_${this._canvas_def._id}`).blend =
@@ -284,18 +315,22 @@ export namespace PIXI_LIVE2D {
             }
         }
 
+
         changeOpacity(opacity: string)
         {
             this._app.view.style.opacity = opacity;
         }
 
+
         setTickSpeed(speed: number = 1){
             this._app.ticker.speed = speed;
         }
 
+
         showTickFPS(){
             console.log(this._app.ticker.FPS);
         }
+
 
         rePosition(positionX: number = this._canvas_def._x,
             positionY: number = this._canvas_def._y,
@@ -310,6 +345,7 @@ export namespace PIXI_LIVE2D {
 
         }
 
+
         resize(){
             let width = this._canvas_def._width;
             let height = this._canvas_def._height;
@@ -321,11 +357,13 @@ export namespace PIXI_LIVE2D {
             this._model.masks.resize(this._app.view.width, this._app.view.height);
         }
 
+
         destroy(){
             this.stopAnimation();
             this._app.ticker.stop();
             this._loader.reset();
             this._app.destroy();
         }
+
     }
 }

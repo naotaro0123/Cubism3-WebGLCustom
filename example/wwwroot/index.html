@@ -18,8 +18,8 @@
     <button id="deletebtn" type="button">モデル削除</button>
     <button id="changeMotion" type="button">次モーション</button>
     <span id="motionNm">Default Motion</span>
-    <button id="changeLoop" type="button">ループON</button>
-    <button id="changeBlend" type="button">ブレンドOVERRIDE</button>
+    <input id="changeLoop" type="checkbox" checked="checked">ループON</input>
+    <input id="changeBlend" type="checkbox" checked="checked">ブレンドOVERRIDE</input>
     <br/>
 
     <span id="speedLabel">スピード</span>
@@ -38,10 +38,13 @@
     <input type="range" id="positionYSlider" value="200" min="0" max="400" step="1">
     <br/>
 
-    <button id="changeSound" type="button">次の音声再生</button>
-    <span id="soundNm">Default Sound</span>
-    <button id="stopSound" type="button">音声停止</button>
-    <button id="changeLipsync" type="button">リップシンクON</button>
+    <button id="changeAudio" type="button">次の音声再生</button>
+    <span id="audioNm">Default Audio</span>
+    <button id="stopAudio" type="button">音声停止</button>
+    <input id="changeLipsync" type="checkbox">リップシンクON</input>
+    <br/>
+    <!-- 音声のビジュアライズ -->
+    <canvas id="visualizer" width="255" height="38"></canvas>
     <br/>
     <br/>
 

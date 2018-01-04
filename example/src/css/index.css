@@ -38,6 +38,11 @@ canvas {
     border: 1px dotted red;
 }
 
+#visualizer {
+    border: none;
+    background: #000;
+}
+
 
 /* Responsive Design
 –––––––––––––––––––––––––––––––––––––––––––––––––– */

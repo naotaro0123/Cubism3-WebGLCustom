@@ -41,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if(animCnt >= model_info.Motions.length){
             animCnt = 0;
         }
-        changeLoop.innerHTML = "ループON";
 
         Live2d_canvas[Live2d_no].playAnimation(animCnt);
         document.getElementById("motionNm").innerText =
@@ -49,14 +48,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }, false);
 
     // モーションループ On/Off
-    let changeLoop = document.getElementById("changeLoop");
-    changeLoop.addEventListener("click", () => {
-        if(changeLoop.innerHTML == "ループON"){
-            changeLoop.innerHTML = "ループOFF";
-        }else{
-            changeLoop.innerHTML = "ループON";
-        }
-        Live2d_canvas[Live2d_no].setLoop(false);
+    let changeLoop = <HTMLInputElement>document.getElementById("changeLoop");
+    changeLoop.addEventListener("change", () => {
+        Live2d_canvas[Live2d_no].setLoop(changeLoop.checked);
     }, false);
 
     // モデル削除
@@ -107,36 +101,37 @@ document.addEventListener("DOMContentLoaded", () => {
     // モーションブレンド
     let changeBlend = document.getElementById("changeBlend");
     changeBlend.addEventListener("click", () => {
-        if(changeBlend.innerHTML == "ブレンドOVERRIDE"){
-            changeBlend.innerHTML = "ブレンドADD";
-        }else{
-            changeBlend.innerHTML = "ブレンドOVERRIDE";
-        }
         blendCnt++;
         Live2d_canvas[Live2d_no].changeBlend(blendCnt);
     }, false);
 
-    let soundCnt : number = 0;
+    let audioCnt : number = 0;
     // 音声切り替え
-    document.getElementById("changeSound").addEventListener("click", () => {
-        soundCnt++;
-        if(soundCnt >= model_info.Sounds.length){
-            soundCnt = 0;
+    document.getElementById("changeAudio").addEventListener("click", () => {
+        audioCnt++;
+        if(audioCnt >= model_info.Audios.length){
+            audioCnt = 0;
         }
 
-        Live2d_canvas[Live2d_no].playSound(soundCnt);
+        Live2d_canvas[Live2d_no].playAudio(audioCnt);
 
-        document.getElementById("soundNm").innerHTML =
-        `${model_info.Sounds[soundCnt]}`.replace("sounds/","").replace(".mp3","");
+        document.getElementById("audioNm").innerHTML =
+        `${model_info.Audios[audioCnt]}`.replace("audio/","").replace(".mp3","");
 
     }, false);
     // 音声停止
-    document.getElementById("stopSound").addEventListener("click", () => {
-        Live2d_canvas[Live2d_no].stopSound(soundCnt);
+    document.getElementById("stopAudio").addEventListener("click", () => {
+        Live2d_canvas[Live2d_no].stopAudio(audioCnt);
     });
 
     // リップシンク
-    document.getElementById("changeLipsync").addEventListener("click", () => {
-        Live2d_canvas[Live2d_no].playLipsync();
+    let changeLipsync = <HTMLInputElement>document.getElementById("changeLipsync");
+    changeLipsync.addEventListener("change", () => {
+        if(changeLipsync.checked == true){
+            Live2d_canvas[Live2d_no].playLipsync();
+        }else{
+            Live2d_canvas[Live2d_no].stopLipsync();
+        }
     });
+
 });
