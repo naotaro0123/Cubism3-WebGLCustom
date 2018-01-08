@@ -3,7 +3,8 @@ export namespace LIVE2DAUDIO
     export class Audio {
         private _audioNames: string[] = [];
         private _audioCtx: AudioContext;
-        private _soundSource: AudioBufferSourceNode;
+        private _soundSource: AudioBufferSourceNode;    // 音声ファイル用
+        private _sourceNode: MediaStreamAudioSourceNode; // マイク音声用
         private _analyser: AnalyserNode;
         private _bufferLengthAlt: number;
         private _dataArrayAlt: Uint8Array;
@@ -45,6 +46,24 @@ export namespace LIVE2DAUDIO
             });
         }
 
+        getAudioAccess(){
+            // https://1000ch.net/posts/2017/visualize-audio-input.html
+            navigator.mediaDevices.getUserMedia({
+                audio: true,
+                video: false
+              }).then(stream => {
+                this._sourceNode = this._audioCtx.createMediaStreamSource(stream);
+
+                // 音声解析用
+                this._analyser = this._audioCtx.createAnalyser();
+                this._bufferLengthAlt = this._analyser.fftSize;
+                this._dataArrayAlt = new Uint8Array(this._bufferLengthAlt);
+
+                this._sourceNode.connect(this._analyser);
+              }).catch(error => {
+                console.log(error);
+              });
+        }
 
         // サウンド再生
         playSound(buffer: AudioBuffer) {
@@ -67,14 +86,19 @@ export namespace LIVE2DAUDIO
         // 音声をビジュアライズ表示する
         visuaLize() {
             if(this._analyser == null) return;
-
+            // https://qiita.com/soarflat/items/4aa001dac115a4af6dbe
+            // マイク用？（時間領域の波形データ）
+            // this._analyser.getByteTimeDomainData(this._dataArrayAlt);
+            // 音声ファイル用（周波数領域の波形データ）
             this._analyser.getByteFrequencyData(this._dataArrayAlt);
+
             // canvas初期化
             this._audioCanvasCtx.fillStyle = 'rgb(0, 0, 0)';
             this._audioCanvasCtx.fillRect(0, 0, this._audioCanvas.width, this._audioCanvas.height);
 
             let barWidth = 0;
-            let barHeight = (this._audioCanvas.width / this._bufferLengthAlt) * 150.0;
+            // let barHeight = (this._audioCanvas.width / this._bufferLengthAlt) * 150.0;
+            let barHeight = (this._audioCanvas.width / this._bufferLengthAlt) * 300.0;
             let maxValue = 0;
 
             for (let i = 0; i < this._bufferLengthAlt; i++) {

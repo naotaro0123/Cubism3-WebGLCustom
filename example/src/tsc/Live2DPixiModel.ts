@@ -317,6 +317,9 @@ export namespace PIXI_LIVE2D {
             this._app.view.style.opacity = opacity;
         }
 
+        getAudioAccess(){
+            this._webAudio.getAudioAccess();
+        }
 
         setTickSpeed(speed: number = 1){
             this._app.ticker.speed = speed;

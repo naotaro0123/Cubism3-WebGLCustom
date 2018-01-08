@@ -139,4 +139,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // 合成音声
+    let TextToSpeech = <HTMLInputElement>document.getElementById("textToSpeech");
+    let SpeakButton = document.getElementById("speakButton").addEventListener("click", () => {
+
+        let speech = new SpeechSynthesisUtterance();
+        let voice = speechSynthesis.getVoices();
+
+        speech.text = TextToSpeech.value;
+        speechSynthesis.speak(speech);
+    });
+
+    // マイクアクセス
+    let micAcess = <HTMLInputElement>document.getElementById("micAcess");
+    micAcess.addEventListener("change", () => {
+        Live2d_canvas[Live2d_no].getAudioAccess();
+    }, false);
+
 });

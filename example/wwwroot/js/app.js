@@ -30,6 +30,21 @@ var LIVE2DAUDIO;
                 _this.playSound(buffer);
             });
         };
+        Audio.prototype.getAudioAccess = function () {
+            var _this = this;
+            navigator.mediaDevices.getUserMedia({
+                audio: true,
+                video: false
+            }).then(function (stream) {
+                _this._sourceNode = _this._audioCtx.createMediaStreamSource(stream);
+                _this._analyser = _this._audioCtx.createAnalyser();
+                _this._bufferLengthAlt = _this._analyser.fftSize;
+                _this._dataArrayAlt = new Uint8Array(_this._bufferLengthAlt);
+                _this._sourceNode.connect(_this._analyser);
+            }).catch(function (error) {
+                console.log(error);
+            });
+        };
         Audio.prototype.playSound = function (buffer) {
             this._soundSource = this._audioCtx.createBufferSource();
             this._soundSource.buffer = buffer;
@@ -47,7 +62,7 @@ var LIVE2DAUDIO;
             this._audioCanvasCtx.fillStyle = 'rgb(0, 0, 0)';
             this._audioCanvasCtx.fillRect(0, 0, this._audioCanvas.width, this._audioCanvas.height);
             var barWidth = 0;
-            var barHeight = (this._audioCanvas.width / this._bufferLengthAlt) * 150.0;
+            var barHeight = (this._audioCanvas.width / this._bufferLengthAlt) * 300.0;
             var maxValue = 0;
             for (var i = 0; i < this._bufferLengthAlt; i++) {
                 barWidth = this._dataArrayAlt[i];
@@ -225,6 +240,17 @@ document.addEventListener("DOMContentLoaded", function () {
             Live2d_canvas[Live2d_no].stopLipsync();
         }
     });
+    var TextToSpeech = document.getElementById("textToSpeech");
+    var SpeakButton = document.getElementById("speakButton").addEventListener("click", function () {
+        var speech = new SpeechSynthesisUtterance();
+        var voice = speechSynthesis.getVoices();
+        speech.text = TextToSpeech.value;
+        speechSynthesis.speak(speech);
+    });
+    var micAcess = document.getElementById("micAcess");
+    micAcess.addEventListener("change", function () {
+        Live2d_canvas[Live2d_no].getAudioAccess();
+    }, false);
 });
 
 },{"./Audio":1,"./Define":2,"./Live2DPixiModel":4}],4:[function(require,module,exports){
@@ -434,6 +460,9 @@ var PIXI_LIVE2D;
         };
         Live2DPixiModel.prototype.changeOpacity = function (opacity) {
             this._app.view.style.opacity = opacity;
+        };
+        Live2DPixiModel.prototype.getAudioAccess = function () {
+            this._webAudio.getAudioAccess();
         };
         Live2DPixiModel.prototype.setTickSpeed = function (speed) {
             if (speed === void 0) { speed = 1; }
