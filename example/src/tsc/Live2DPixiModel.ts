@@ -123,7 +123,7 @@ export namespace PIXI_LIVE2D {
                 this._modelbuilder.addTexture(i, _resources[`Texture${i}_${this._canvas_def._id}`].texture);
             }
             // Motion
-            this._modelbuilder.addAnimatorLayer(`Base_${this._canvas_def._id}`,
+              this._modelbuilder.addAnimatorLayer(`Base_${this._canvas_def._id}`,
                 LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
             // Lipsync Motion
             this._modelbuilder.addAnimatorLayer(`Lipsync_${this._canvas_def._id}`,
@@ -219,7 +219,7 @@ export namespace PIXI_LIVE2D {
                     // const sample = (Math.sin(time*9.543)+1 + Math.sin(time*13.831))/2;
                     const sample = this._webAudio.getVolume();
                     target.parameters.values[this._param_mouth_open_y] =
-                    blend(target.parameters.values[this._param_mouth_open_y], sample, weight);
+                    blend(target.parameters.values[this._param_mouth_open_y], sample, 0, weight);
                 }
             }
             this._model.animator.getLayer(`Lipsync_${this._canvas_def._id}`).play(this._emptyanims[0]);
@@ -273,27 +273,27 @@ export namespace PIXI_LIVE2D {
                 // angle_x
                 if (this._param_angle_x >= 0) {
                     target.parameters.values[this._param_angle_x] =
-                    blend(target.parameters.values[this._param_angle_x], this._pos_x * 30, weight);
+                    blend(target.parameters.values[this._param_angle_x], this._pos_x * 30, 0, weight);
                 }
                 // angle_y
                 if (this._param_angle_y >= 0) {
                     target.parameters.values[this._param_angle_y] =
-                    blend(target.parameters.values[this._param_angle_y], -this._pos_y * 30, weight);
+                    blend(target.parameters.values[this._param_angle_y], -this._pos_y * 30, 0, weight);
                 }
                 // body_angle_x
                 if (this._param_body_angle_x >= 0) {
                     target.parameters.values[this._param_body_angle_x] =
-                    blend(target.parameters.values[this._param_body_angle_x], this._pos_x * 10, weight);
+                    blend(target.parameters.values[this._param_body_angle_x], this._pos_x * 10, 0, weight);
                 }
                 // eye_ball_x
                 if (this._param_eye_ball_x >= 0) {
                     target.parameters.values[this._param_eye_ball_x] =
-                    blend(target.parameters.values[this._param_eye_ball_x], this._pos_x, weight);
+                    blend(target.parameters.values[this._param_eye_ball_x], this._pos_x, 0, weight);
                 }
                 // eye_ball_y
                 if (this._param_eye_ball_y >= 0) {
                     target.parameters.values[this._param_eye_ball_y] =
-                    blend(target.parameters.values[this._param_eye_ball_y], -this._pos_y, weight);
+                    blend(target.parameters.values[this._param_eye_ball_y], -this._pos_y, 0, weight);
                 }
             }
 
