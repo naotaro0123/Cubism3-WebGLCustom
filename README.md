@@ -1,5 +1,5 @@
 # Cubism WebGL SDK3.0でリップシンク
-Cubism WebGL SDK(https://github.com/Live2D/CubismJsComponents)を元にWebAudioでリップシンクさせたサンプルです。
+Cubism WebGL SDK(https://github.com/Live2D/CubismJsComponents) を元にWebAudioでリップシンクさせたサンプルです。
 
 
 ## 使い方
@@ -16,6 +16,6 @@ example/wwwroot配下に出力されるので、index.htmlを実行すると以�
 - Canvasの透明度調整
 - Live2Dモデルの位置と拡大縮小
 
-![LipSync](https://github.com/naotaro0123/Cubism3_WebGL_Custom/images/LipSync.gif)
+![LipSync](https://github.com/naotaro0123/Cubism3_WebGL_Custom/blob/master/images/LipSync.gif)
 
-![MouseTracking](https://github.com/naotaro0123/Cubism3_WebGL_Custom/images/MouseTracking.gif)
+![MouseTracking](https://github.com/naotaro0123/Cubism3_WebGL_Custom/blob/master/images/MouseTracking.gif)
