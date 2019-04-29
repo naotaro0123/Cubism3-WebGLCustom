@@ -1,6 +1,6 @@
 /*
  * Copyright(c) Live2D Inc. All rights reserved.
- * 
+ *
  * Use of this source code is governed by the Live2D Open Software license
  * that can be found at http://live2d.com/eula/live2d-open-software-license-agreement_en.html.
  */
@@ -10,15 +10,15 @@ namespace LIVE2DCUBISMPIXI {
     /** PIXI Cubism model wrapper. */
     export class Model extends PIXI.Container {
         /** Parameters. */
-        public get parameters(): LIVE2DCUBISMCORE.Parameters {
+        public get parameters(): Live2DCubismCore.Parameters {
             return this._coreModel.parameters;
         }
         /** Parts. */
-        public get parts(): LIVE2DCUBISMCORE.Parts {
+        public get parts(): Live2DCubismCore.Parts {
             return this._coreModel.parts;
         }
         /** Drawables. */
-        public get drawables(): LIVE2DCUBISMCORE.Drawables {
+        public get drawables(): Live2DCubismCore.Drawables {
             return this._coreModel.drawables;
         }
         /** Textures. */
@@ -50,7 +50,7 @@ namespace LIVE2DCUBISMPIXI {
                 this._physicsRig.updateAndEvaluate(deltaTime);
             }
 
-            
+
             // Update model.
             this._coreModel.update();
 
@@ -60,14 +60,14 @@ namespace LIVE2DCUBISMPIXI {
             for (let m = 0; m < this._meshes.length; ++m) {
                 // Sync opacity and visiblity.
                 this._meshes[m].alpha = this._coreModel.drawables.opacities[m];
-                this._meshes[m].visible = LIVE2DCUBISMCORE.Utils.hasIsVisibleBit(this._coreModel.drawables.dynamicFlags[m]);
+                this._meshes[m].visible = Live2DCubismCore.Utils.hasIsVisibleBit(this._coreModel.drawables.dynamicFlags[m]);
                 // Sync vertex positions if necessary.
-                if (LIVE2DCUBISMCORE.Utils.hasVertexPositionsDidChangeBit(this._coreModel.drawables.dynamicFlags[m])) {
+                if (Live2DCubismCore.Utils.hasVertexPositionsDidChangeBit(this._coreModel.drawables.dynamicFlags[m])) {
                     this._meshes[m].vertices = this._coreModel.drawables.vertexPositions[m];
                     this._meshes[m].dirtyVertex = true;
                 }
                 // Update render order if necessary.
-                if (LIVE2DCUBISMCORE.Utils.hasRenderOrderDidChangeBit(this._coreModel.drawables.dynamicFlags[m])) {
+                if (Live2DCubismCore.Utils.hasRenderOrderDidChangeBit(this._coreModel.drawables.dynamicFlags[m])) {
                     sort = true;
                 }
             }
@@ -121,15 +121,15 @@ namespace LIVE2DCUBISMPIXI {
 
         /**
          * Creates model.
-         * 
+         *
          * @param moc Moc.
          * @param textures Textures.
          * @param animator Animator.
          * @param physicsRig [Optional] Physics rig.
-         * 
+         *
          * @return Model on success; 'null' otherwise.
          */
-        public static _create(coreModel: LIVE2DCUBISMCORE.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator, physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig = null): Model {
+        public static _create(coreModel: Live2DCubismCore.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator, physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig = null): Model {
             let model = new Model(coreModel, textures, animator, physicsRig);
 
 
@@ -146,7 +146,7 @@ namespace LIVE2DCUBISMPIXI {
 
 
         /** Cubism model. */
-        private _coreModel: LIVE2DCUBISMCORE.Model;
+        private _coreModel: Live2DCubismCore.Model;
         /** Drawable textures. */
         private _textures: Array<PIXI.Texture>;
         /** Animator. */
@@ -162,11 +162,11 @@ namespace LIVE2DCUBISMPIXI {
 
         /**
          * Creates instance.
-         * 
+         *
          * @param moc Moc.
-         * @param textures Textures. 
+         * @param textures Textures.
          */
-        private constructor(coreModel: LIVE2DCUBISMCORE.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator, physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig)
+        private constructor(coreModel: Live2DCubismCore.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator, physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig)
         {
             // Initialize base class.
             super();
@@ -198,7 +198,7 @@ namespace LIVE2DCUBISMPIXI {
                     uvs[v] = 1 - uvs[v];
                 }
 
-                
+
                 // Create mesh.
                 this._meshes[m] = new PIXI.mesh.Mesh(
                     textures[this._coreModel.drawables.textureIndices[m]],
@@ -209,13 +209,13 @@ namespace LIVE2DCUBISMPIXI {
 
 
                 // HACK Flip mesh...
-                this._meshes[m].scale.y *= -1; 
+                this._meshes[m].scale.y *= -1;
 
 
                 // TODO Implement culling.
 
 
-                if (LIVE2DCUBISMCORE.Utils.hasBlendAdditiveBit(this._coreModel.drawables.constantFlags[m])) {
+                if (Live2DCubismCore.Utils.hasBlendAdditiveBit(this._coreModel.drawables.constantFlags[m])) {
                     // Masked mesh is disabled additive blending mode.
                     // https://github.com/pixijs/pixi.js/issues/3824
                     if(this._coreModel.drawables.maskCounts[m] > 0){
@@ -226,7 +226,7 @@ namespace LIVE2DCUBISMPIXI {
                         this._meshes[m].blendMode = PIXI.BLEND_MODES.ADD;
                     }
                 }
-                else if (LIVE2DCUBISMCORE.Utils.hasBlendMultiplicativeBit(this._coreModel.drawables.constantFlags[m])) {
+                else if (Live2DCubismCore.Utils.hasBlendMultiplicativeBit(this._coreModel.drawables.constantFlags[m])) {
                     // Masked mesh is disabled multiply blending mode.
                     // https://github.com/pixijs/pixi.js/issues/3824
                     if(this._coreModel.drawables.maskCounts[m] > 0){
@@ -238,7 +238,7 @@ namespace LIVE2DCUBISMPIXI {
                     }
                 }
 
-                
+
                 // Attach mesh to self.
                 this.addChild(this._meshes[m]);
             };
@@ -273,7 +273,7 @@ namespace LIVE2DCUBISMPIXI {
 
         /** Destroys objects. */
         public destroy(options?: any): void {
-            
+
             this._maskSprites.forEach((m) => {
                 m.destroy();
             });
@@ -294,27 +294,27 @@ namespace LIVE2DCUBISMPIXI {
          * @param coreModel Core Model.
          * @param pixiModel PixiJS Model.
          */
-        public constructor(coreModel: LIVE2DCUBISMCORE.Model, pixiModel: LIVE2DCUBISMPIXI.Model){
+        public constructor(coreModel: Live2DCubismCore.Model, pixiModel: LIVE2DCUBISMPIXI.Model){
             // Initialize base class.
             super();
 
-            // Masky shader for render the texture that attach to mask sprite. 
+            // Masky shader for render the texture that attach to mask sprite.
             this._maskShader = new PIXI.Filter(this._maskShaderVertSrc.toString(), this._maskShaderFragSrc.toString());
 
             let _maskCounts = coreModel.drawables.maskCounts;
             let _maskRelationList = coreModel.drawables.masks;
-            
+
             this._maskMeshContainers = new Array<PIXI.Container>();
             this._maskTextures = new Array<PIXI.RenderTexture>();
             this._maskSprites = new Array<PIXI.Sprite>();
 
             for(let m=0; m < pixiModel.meshes.length; ++m){
                 if(_maskCounts[m] > 0){
-                    
+
                     let newContainer = new PIXI.Container;
-                    
+
                     for(let n = 0; n < _maskRelationList[m].length; ++n){
-                        let meshMaskID = coreModel.drawables.masks[m][n];                  
+                        let meshMaskID = coreModel.drawables.masks[m][n];
                         let maskMesh = new PIXI.mesh.Mesh(
                             pixiModel.meshes[meshMaskID].texture,
                             pixiModel.meshes[meshMaskID].vertices,
@@ -337,7 +337,7 @@ namespace LIVE2DCUBISMPIXI {
                     newContainer.worldTransform = pixiModel.worldTransform;
                     newContainer.localTransform = pixiModel.localTransform;
                     this._maskMeshContainers.push(newContainer);
-                    
+
                     // Create RenderTexture instance.
                     let newTexture = PIXI.RenderTexture.create(0, 0);
                     this._maskTextures.push(newTexture);
@@ -406,12 +406,12 @@ namespace LIVE2DCUBISMPIXI {
     export class ModelBuilder {
         /**
          * Sets moc.
-         * 
+         *
          * @param value Moc.
-         * 
+         *
          * @return Builder.
          */
-        public setMoc(value: LIVE2DCUBISMCORE.Moc): ModelBuilder {
+        public setMoc(value: Live2DCubismCore.Moc): ModelBuilder {
             this._moc = value;
 
 
@@ -422,7 +422,7 @@ namespace LIVE2DCUBISMPIXI {
          * Sets animator time scale.
          *
          * @param value Time scale.
-         * 
+         *
          * @return Builder.
          */
         public setTimeScale(value: number): ModelBuilder {
@@ -434,9 +434,9 @@ namespace LIVE2DCUBISMPIXI {
 
         /**
          * Sets physics JSON file.
-         * 
+         *
          * @param value Physics JSON file.
-         * 
+         *
          * @return Builder.
          */
         public setPhysics3Json(value: any): ModelBuilder {
@@ -451,10 +451,10 @@ namespace LIVE2DCUBISMPIXI {
 
         /**
          * Adds texture.
-         * 
+         *
          * @param index Texture index.
          * @param texture Texture.
-         * 
+         *
          * @return Builder.
          */
         public addTexture(index: number, texture: PIXI.Texture): ModelBuilder {
@@ -470,7 +470,7 @@ namespace LIVE2DCUBISMPIXI {
          * @param name Name.
          * @param blender Blender.
          * @param weight Weight.
-         * 
+         *
          * @return Builder.
          */
         public addAnimatorLayer(name: string, blender: LIVE2DCUBISMFRAMEWORK.IAnimationBlender = LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, weight: number = 1) {
@@ -491,7 +491,7 @@ namespace LIVE2DCUBISMPIXI {
 
 
             // Create core.
-            let coreModel = LIVE2DCUBISMCORE.Model.fromMoc(this._moc);
+            let coreModel = Live2DCubismCore.Model.fromMoc(this._moc);
 
 
             if (coreModel == null) {
@@ -524,7 +524,7 @@ namespace LIVE2DCUBISMPIXI {
 
 
         /** Moc. */
-        private _moc: LIVE2DCUBISMCORE.Moc;
+        private _moc: Live2DCubismCore.Moc;
         /** Textures. */
         private _textures: Array<PIXI.Texture> = new Array<PIXI.Texture>();
         /** Time scale. */

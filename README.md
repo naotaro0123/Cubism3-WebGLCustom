@@ -1,8 +1,30 @@
 # Cubism WebGL SDK3.0でリップシンク
-Cubism WebGL SDK(https://github.com/Live2D/CubismJsComponents) を元にWebAudioでリップシンクさせたサンプルです。
+[Cubism WebGL SDK](https://github.com/Live2D/CubismJsComponents) を元にWebAudioでリップシンクさせたサンプルです。
+
+メインのソースは以下です  
+https://github.com/naotaro0123/Cubism3-WebGLCustom/tree/master/example/src
+
+## DEMO  
+https://naotaro0123.github.io/Cubism3-WebGLCustom/tree/master/example/wwwroot/
 
 
-## 使い方
+## Build Setup
+
+``` bash
+# install dependencies
+npm install
+
+cd example
+
+# install dependencies
+npm install
+
+# build ts file
+gulp
+
+cd www
+open index.html
+```
 
 npm install後、src配下のtsconfig.jsonとexample/src配下のtsconfig.jsonをビルドします。
 example/wwwroot配下に出力されるので、index.htmlを実行すると以下の機能が使えます。

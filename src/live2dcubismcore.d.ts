@@ -1,4 +1,4 @@
-declare namespace LIVE2DCUBISMCORE {
+declare namespace Live2DCubismCore {
     /** Cubism moc. */
     class Moc {
         /** Creates [[Moc]] from [[ArrayBuffer]].

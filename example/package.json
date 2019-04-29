@@ -6,7 +6,7 @@
         "type": "git",
         "url": "https://github.com/Live2D/CubismJsComponents.git"
     },
-    "author": "Live2D Inc.",
+    "author": "naotaro0123",
     "license": "SEE LICENSE IN http://live2d.com/eula/live2d-open-software-license-agreement_en.html.",
     "devDependencies": {
         "@types/pixi.js": "^4.6.2",

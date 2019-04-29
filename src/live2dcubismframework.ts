@@ -1,6 +1,6 @@
 /*
  * Copyright(c) Live2D Inc. All rights reserved.
- * 
+ *
  * Use of this source code is governed by the Live2D Open Software license
  * that can be found at http://live2d.com/eula/live2d-open-software-license-agreement_en.html.
  */
@@ -11,7 +11,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
     export class AnimationPoint {
         /**
          * Initializes point.
-         * 
+         *
          * @param time Timing.
          * @param value Value at time.
          */
@@ -23,11 +23,11 @@ namespace LIVE2DCUBISMFRAMEWORK {
     export interface IAnimationSegmentEvaluator {
         /**
          * Evaluates segment.
-         * 
+         *
          * @param points Points.
          * @param offset Offset into points.
          * @param time Time to evaluate at.
-         * 
+         *
          * @return Evaluation result.
          */
         (points: Array<AnimationPoint>, offset: number, time: number): number;
@@ -38,11 +38,11 @@ namespace LIVE2DCUBISMFRAMEWORK {
     export class BuiltinAnimationSegmentEvaluators {
         /**
          * Linear segment evaluator.
-         * 
+         *
          * @param points Points.
          * @param offset Offset into points.
          * @param time Time to evaluate at.
-         * 
+         *
          * @return Evaluation result.
          */
         public static LINEAR: IAnimationSegmentEvaluator = function(points: Array<AnimationPoint>, offset: number, time: number): number {
@@ -56,11 +56,11 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Bézier segment evaluator.
-         * 
+         *
          * @param points Points.
          * @param offset Offset into points.
          * @param time Time to evaluate at.
-         * 
+         *
          * @return Evaluation result.
          */
         public static BEZIER: IAnimationSegmentEvaluator = function(points: Array<AnimationPoint>, offset: number, time: number): number {
@@ -80,11 +80,11 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Stepped segment evaluator.
-         * 
+         *
          * @param points Points.
          * @param offset Offset into points.
          * @param time Time to evaluate at.
-         * 
+         *
          * @return Evaluationr result.
          */
         public static STEPPED: IAnimationSegmentEvaluator = function(points: Array<AnimationPoint>, offset: number, time: number): number {
@@ -93,11 +93,11 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Inverse-stepped segment evaluator.
-         * 
+         *
          * @param points Points.
          * @param offset Offset into points.
          * @param time Time to evaluate at.
-         * 
+         *
          * @return Evaluationr result.
          */
         public static INVERSE_STEPPED: IAnimationSegmentEvaluator = function(points: Array<AnimationPoint>, offset: number, time: number): number {
@@ -107,11 +107,11 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Interpolates points.
-         * 
+         *
          * @param a First point.
          * @param b Second point.
          * @param t Weight.
-         * 
+         *
          * @return Interpolation result.
          */
         private static lerp(a: AnimationPoint, b: AnimationPoint, t: number): AnimationPoint {
@@ -137,19 +137,19 @@ namespace LIVE2DCUBISMFRAMEWORK {
     export class AnimationTrack {
         /**
          * Initializes instance.
-         * 
+         *
          * @param targetId Target ID.
          * @param points Points.
          * @param segments Segments.
          */
         public constructor(public targetId: string, public points: Array<AnimationPoint>, public segments: Array<AnimationSegment>) {}
-        
+
 
         /**
          * Evaluates track
-         * 
+         *
          * @param time Time to evaluate at.
-         * 
+         *
          * @return Evaluation result.
          */
         public evaluate(time: number): number {
@@ -179,10 +179,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
     export class Animation {
         /**
          * Deserializes animation from motion3.json.
-         * 
+         *
          * @param motion3Json Parsed motion3.json
-         * 
-         * @return Animation on success; 'null' otherwise. 
+         *
+         * @return Animation on success; 'null' otherwise.
          */
         public static fromMotion3Json(motion3Json: any): Animation {
             if (motion3Json == null) {
@@ -220,13 +220,13 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Evaluates animation.
-         * 
-         * @param time Time. 
+         *
+         * @param time Time.
          * @param weight Weight.
          * @param blend Blender.
          * @param target Target.
          */
-        public evaluate(time: number, weight: number, blend: IAnimationBlender, target: LIVE2DCUBISMCORE.Model): void {
+        public evaluate(time: number, weight: number, blend: IAnimationBlender, target: Live2DCubismCore.Model): void {
             // Return early if influence is miminal.
             if (weight <= 0.01) {
                 return;
@@ -266,8 +266,8 @@ namespace LIVE2DCUBISMFRAMEWORK {
                     target.parts.opacities[p] = blend(target.parts.opacities[p], sample, weight);
                 }
             });
-            
-            
+
+
             // TODO Evaluate model tracks.
         }
 
@@ -280,7 +280,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Creates instance.
-         * 
+         *
          * @param motion3Json Parsed motion3.json.
          */
         private constructor(motion3Json: any) {
@@ -306,8 +306,8 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 for (var t = 2; t < s.length; t += 3) {
                     let offset = points.length - 1;
                     let evaluate = BuiltinAnimationSegmentEvaluators.LINEAR;
-                    
-            
+
+
                     // Handle segment types.
                     let type = s[t];
 
@@ -364,10 +364,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
     export interface IAnimationCrossfadeWeighter {
         /**
          * Weights crossfade.
-         * 
+         *
          * @param time Current fade time.
          * @param duration Total fade duration.
-         * 
+         *
          * @return Normalized source weight. (Destination will be weight as (1 - source weight)).
          */
         (time: number, duration: number): number;
@@ -378,15 +378,15 @@ namespace LIVE2DCUBISMFRAMEWORK {
     export class BuiltinCrossfadeWeighters {
         /**
          * Linear crossfade weighter.
-         *  
+         *
          * @param time Current fade time.
          * @param duration Total fade duration.
-         * 
+         *
          * @return Normalized source weight. (Destination will be weight as (1 - source weight)).
          */
         public static LINEAR(time: number, duration: number): number {
             return (time / duration);
-        } 
+        }
     }
 
 
@@ -401,11 +401,11 @@ namespace LIVE2DCUBISMFRAMEWORK {
     export interface IAnimationBlender {
         /**
          * Blends.
-         * 
+         *
          * @param source Source value.
          * @param destination Destination value.
          * @param weight Weight.
-         *  
+         *
          * @return Blend result.
          */
         (source: number, destination: number, weight: number): number;
@@ -416,11 +416,11 @@ namespace LIVE2DCUBISMFRAMEWORK {
     export class BuiltinAnimationBlenders {
         /**
          * Override blender.
-         * 
+         *
          * @param source Source value.
          * @param destination Destination value.
          * @param weight Weight.
-         *  
+         *
          * @return Blend result.
          */
         public static OVERRIDE: IAnimationBlender = function(source: number, destination: number, weight: number): number {
@@ -429,11 +429,11 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Additive blender.
-         * 
+         *
          * @param source Source value.
          * @param destination Destination value.
          * @param weight Weight.
-         *  
+         *
          * @return Blend result.
          */
         public static ADD: IAnimationBlender = function(source: number, destination: number, weight: number): number {
@@ -442,11 +442,11 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Multiplicative blender.
-         * 
+         *
          * @param source Source value.
          * @param destination Destination value.
          * @param weight Weight.
-         *  
+         *
          * @return Blend result.
          */
         public static MULTIPLY: IAnimationBlender = function(source: number, destination: number, weight: number): number {
@@ -509,7 +509,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
         public resume(): void {
             this._play = true;
         }
-        
+
         /** Pauses playback (preserving time). */
         public pause(): void {
             this._play = false;
@@ -564,10 +564,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Applies results to [[target]].
-         * 
+         *
          * @param target Target.
          */
-        public _evaluate(target: LIVE2DCUBISMCORE.Model): void {
+        public _evaluate(target: Live2DCubismCore.Model): void {
             // Return if evaluation isn't possible.
             if (this._animation == null) {
                 return;
@@ -611,7 +611,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
     /** Cubism animator. */
     export class Animator {
         /** Target model. */
-        public get target(): LIVE2DCUBISMCORE.Model {
+        public get target(): Live2DCubismCore.Model {
             return this._target;
         }
 
@@ -623,7 +623,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
          * Gets layer by name.
          *
          * @param name Name.
-         * 
+         *
          * @return Animation layer if found; 'null' otherwise.
          */
         public getLayer(name: string): AnimationLayer {
@@ -658,12 +658,12 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Creates animator.
-         * 
+         *
          * @param target Target.
-         * 
+         *
          * @return Animator on success; 'null' otherwise.
          */
-        public static _create(target: LIVE2DCUBISMCORE.Model, timeScale: number, layers: Map<string, AnimationLayer>): Animator {
+        public static _create(target: Live2DCubismCore.Model, timeScale: number, layers: Map<string, AnimationLayer>): Animator {
             let animator = new Animator(target, timeScale,layers);
 
 
@@ -674,7 +674,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
 
         /** Target. */
-        private _target: LIVE2DCUBISMCORE.Model;
+        private _target: Live2DCubismCore.Model;
 
         /** Layers. */
         private _layers: Map<string, AnimationLayer>;
@@ -687,12 +687,12 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Creates instance.
-         * 
+         *
          * @param target Target.
          * @param timeScale Time scale.
          * @param layers Layers.
          */
-        private constructor(target: LIVE2DCUBISMCORE.Model, timeScale: number, layers: Map<string, AnimationLayer>) {
+        private constructor(target: Live2DCubismCore.Model, timeScale: number, layers: Map<string, AnimationLayer>) {
             this._target = target;
             this.timeScale = timeScale;
             this._layers = layers;
@@ -706,10 +706,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
          * Sets target model.
          *
          * @param value Target.
-         * 
+         *
          * @return Builder.
          */
-        public setTarget(value: LIVE2DCUBISMCORE.Model): AnimatorBuilder {
+        public setTarget(value: Live2DCubismCore.Model): AnimatorBuilder {
             this._target = value;
 
 
@@ -720,7 +720,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
          * Sets time scale.
          *
          * @param value Time scale.
-         * 
+         *
          * @return Builder.
          */
         public setTimeScale(value: number): AnimatorBuilder {
@@ -736,7 +736,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
          * @param name Name.
          * @param blender Blender.
          * @param weight Weight.
-         * 
+         *
          * @return Builder.
          */
         public addLayer(name: string, blender: IAnimationBlender = BuiltinAnimationBlenders.OVERRIDE, weight: number = 1) {
@@ -754,7 +754,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Builds [[Animator]].
-         * 
+         *
          * @return Animator on success; 'null' otherwise.
          */
         public build(): Animator {
@@ -784,7 +784,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
 
         /** Target. */
-        private _target: LIVE2DCUBISMCORE.Model;
+        private _target: Live2DCubismCore.Model;
 
         /** Time scale. */
         private _timeScale: number = 1;
@@ -810,10 +810,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
 
         /** Calculates distance between points.
-         * 
+         *
          * @param a First point.
          * @param b Second point.
-         * 
+         *
          * @return Distance.
          */
         public static distance(a: PhysicsVector2, b: PhysicsVector2): number {
@@ -822,10 +822,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Calculates dor product.
-         * 
+         *
          * @param a First vector.
          * @param b Second vector.
-         * 
+         *
          * @return Dot product.
          */
         public static dot(a: PhysicsVector2, b: PhysicsVector2): number {
@@ -843,16 +843,16 @@ namespace LIVE2DCUBISMFRAMEWORK {
          * Initializes instance.
          *
          * @param x X component.
-         * @param y Y component. 
+         * @param y Y component.
          */
         public constructor(public x: number, public y: number) {}
 
 
         /**
          * Sums vectors.
-         * 
+         *
          * @param vector2 Other vector.
-         * 
+         *
          * @return Summed vector.
          */
         public add(vector2: PhysicsVector2): PhysicsVector2 {
@@ -861,9 +861,9 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Substracts vectors.
-         * 
+         *
          * @param vector2 Other vector.
-         * 
+         *
          * @return Result.
          */
         public substract(vector2: PhysicsVector2): PhysicsVector2 {
@@ -873,9 +873,9 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Multiplies vectors.
-         * 
+         *
          * @param vector2 Other vector.
-         * 
+         *
          * @return Result.
          */
         public multiply(vector2: PhysicsVector2): PhysicsVector2 {
@@ -884,9 +884,9 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Multiplies vector and scalar.
-         * 
+         *
          * @param scalar Scalar.
-         * 
+         *
          * @return Result.
          */
         public multiplyByScalar(scalar: number): PhysicsVector2 {
@@ -896,9 +896,9 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Divides vectors.
-         * 
+         *
          * @param vector2 Other vector.
-         * 
+         *
          * @return Result.
          */
         public divide(vector2: PhysicsVector2): PhysicsVector2 {
@@ -907,9 +907,9 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Divides vector by scalar.
-         * 
+         *
          * @param scalar Scalar.
-         * 
+         *
          * @return Result.
          */
         public divideByScalar(scalar: number): PhysicsVector2 {
@@ -919,10 +919,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Rotates by radians.
-         * 
+         *
          * @param radians Radians.
-         * 
-         * @return Result. 
+         *
+         * @return Result.
          */
         public rotateByRadians(radians: number): PhysicsVector2 {
             let x = (this.x * Math.cos(radians)) - (this.y * Math.sin(radians));
@@ -935,7 +935,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Calculates normalized vector.
-         * 
+         *
          * @return Result.
          */
         public normalize(): PhysicsVector2 {
@@ -972,11 +972,11 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Clamps scalar.
-         * 
+         *
          * @param scalar Value to clamp.
          * @param lower Lower boundary.
          * @param upper Upper boundary.
-         * 
+         *
          * @return Clamp result.
          */
         public static clampScalar(scalar: number, lower: number, upper: number): number {
@@ -992,10 +992,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Converts direction to degrees.
-         * 
+         *
          * @param from Base vector.
          * @param to Direction vector.
-         * 
+         *
          * @return Degrees.
          */
         public static directionToDegrees(from: PhysicsVector2, to: PhysicsVector2): number {
@@ -1010,7 +1010,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Converts radians to degrees.
-         * 
+         *
          * @param radians Radians.
          *
          * @return Degrees.
@@ -1021,9 +1021,9 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Converts radians to direction.
-         * 
+         *
          * @param radians Radians.
-         * 
+         *
          * @return Direction.
          */
         public static radiansToDirection(radians: number): PhysicsVector2 {
@@ -1033,7 +1033,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Converts degrees to radians.
-         * 
+         *
          * @param degrees Degrees.
          *
          * @return Radians.
@@ -1045,10 +1045,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Converts direction to radians.
-         * 
+         *
          * @param from Base vector.
          * @param to Direction vector.
-         * 
+         *
          * @return Radians.
          */
         public static directionToRadians(from: PhysicsVector2, to: PhysicsVector2): number {
@@ -1061,7 +1061,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 return 0;
             }
 
-            
+
             let cosTheta = (dot / magnitude);
 
 
@@ -1089,10 +1089,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
         /** Current velocity. */
         public velocity: PhysicsVector2;
 
-        
+
         /**
          * Initializes instance.
-         * 
+         *
          * @param initialPosition Initial position.
          * @param mobility Mobility.
          * @param delay Delay.
@@ -1113,7 +1113,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
     export class PhysicsFactorTuple {
         /**
          * Initializes instance.
-         * 
+         *
          * @param x X-factor.
          * @param y Y-factor.
          * @param angle Angle factor.
@@ -1123,9 +1123,9 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Calculates sum.
-         * 
+         *
          * @param factor Other factor.
-         * 
+         *
          * @return Sum.
          */
         public add(factor: PhysicsFactorTuple): PhysicsFactorTuple {
@@ -1143,7 +1143,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
     export class PhysicsNormalizationTuple {
         /**
          * Initializes instance.
-         * 
+         *
          * @param minimum Lower limit.
          * @param maximum Upper limit.
          * @param def Default.
@@ -1156,7 +1156,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
     export class PhysicsNormalizationOptions {
         /**
          * Initializes instance.
-         * 
+         *
          * @param position Position normalization info.
          * @param angle Angle normalization info.
          */
@@ -1174,7 +1174,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Initializes instance.
-         * 
+         *
          * @param targetId Target parameter ID.
          * @param weight Weight.
          * @param factor Factor.
@@ -1185,13 +1185,13 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Evaluates input factor.
-         * 
+         *
          * @param parameterValue Current parameter value.
          * @param parameterMinimum Minimum parameter value.
          * @param parameterMaxium Maximum parameter value.
          * @param parameterDefault Default parameter value.
          * @param normalization Normalization constraint.
-         * 
+         *
          * @return Input factor.
          */
         public evaluateFactor(parameterValue: number, parameterMinimum: number, parameterMaximum: number, parameterDefault: number, normalization: PhysicsNormalizationOptions): PhysicsFactorTuple {
@@ -1221,7 +1221,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
                     }
                 }
                 break;
-                
+
                 case -1:{
                     let parameterRange = parameterMiddle - parameterMinimum;
                     if (parameterRange == 0) {
@@ -1239,7 +1239,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
                     }
                 }
                 break;
-                
+
                 case 0:{
                     value = normalization.angle.def;
                 }
@@ -1284,7 +1284,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Initializes instance.
-         * 
+         *
          * @param targetId Target parameter ID.
          * @param particleIndex Particle index.
          * @param weight Weight.
@@ -1299,10 +1299,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Evaluates translation.
-         * 
+         *
          * @param translation Translation.
          * @param particles Particles.
-         * 
+         *
          * @return Evaluation result.
          */
         public evaluateValue(translation: PhysicsVector2, particles: Array<PhysicsParticle>): number {
@@ -1311,7 +1311,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
             if (this.factor.angle > 0) {
                 let parentGravity = Physics.gravity.multiplyByScalar(-1);
-                
+
 
                 if (Physics.correctAngles && this.particleIndex > 1) {
                     parentGravity = particles[this.particleIndex - 2].position
@@ -1342,7 +1342,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
     export class PhysicsSubRig {
         /**
          * Initializes instance.
-         * 
+         *
          * @param input Input.
          * @param output Output.
          * @param particles Particles.
@@ -1353,10 +1353,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Updates simulation.
-         * 
+         *
          * @param deltaTime Delta time.
          */
-        public _update(deltaTime: number, target: LIVE2DCUBISMCORE.Model) {
+        public _update(deltaTime: number, target: Live2DCubismCore.Model) {
             let parameters = target.parameters;
 
 
@@ -1408,7 +1408,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 // The Cubism Editor expects physics simulation to run at 30 FPS,
                 // so we scale time here accordingly.
                 let delay = p.delay * deltaTime * 30;
-                
+
 
                 let direction = p.position.substract(this.particles[i - 1].position);
                 let distance = PhysicsVector2.distance(PhysicsVector2.zero, direction);
@@ -1418,11 +1418,11 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 direction = direction
                     .rotateByRadians(radians)
                     .normalize();
-                
+
 
                 p.position = this.particles[i - 1].position.add(direction.multiplyByScalar(distance));
-                    
-                
+
+
                 let velocity = p.velocity.multiplyByScalar(delay);
                 let force = p.force
                     .multiplyByScalar(delay)
@@ -1465,10 +1465,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Applies simulation to [[target]].
-         * 
+         *
          * @param target Target.
          */
-        public _evaluate(target: LIVE2DCUBISMCORE.Model) {
+        public _evaluate(target: Live2DCubismCore.Model) {
             let parameters = target.parameters;
 
 
@@ -1527,12 +1527,12 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Creates physics rig.
-         * 
+         *
          * @param physics3Json Physics descriptor.
-         * 
+         *
          * @return Rig on success; [[null]] otherwise.
          */
-        public static _fromPhysics3Json(target: LIVE2DCUBISMCORE.Model, timeScale: number, physics3Json: any) {
+        public static _fromPhysics3Json(target: Live2DCubismCore.Model, timeScale: number, physics3Json: any) {
             let rig = new PhysicsRig(target, timeScale, physics3Json);
 
 
@@ -1543,7 +1543,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
 
         /** Target model. */
-        private _target: LIVE2DCUBISMCORE.Model;
+        private _target: Live2DCubismCore.Model;
 
         /** Sub rigs. */
         private _subRigs: Array<PhysicsSubRig>;
@@ -1556,10 +1556,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Initializes instance.
-         * 
+         *
          * @param physics3Json Physics descriptor.
          */
-        private constructor(target: LIVE2DCUBISMCORE.Model, timeScale: number, physics3Json: any) {
+        private constructor(target: Live2DCubismCore.Model, timeScale: number, physics3Json: any) {
             // Store arguments.
             this.timeScale = timeScale;
             this._target = target;
@@ -1620,7 +1620,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
                 // Create sub rig.
                 this._subRigs.push(new PhysicsSubRig(input, output, particles, normalization));
-            });            
+            });
 
 
             // TODO Validate state.
@@ -1634,10 +1634,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
          * Sets target model.
          *
          * @param value Target.
-         * 
+         *
          * @return Builder.
          */
-        public setTarget(value: LIVE2DCUBISMCORE.Model): PhysicsRigBuilder {
+        public setTarget(value: Live2DCubismCore.Model): PhysicsRigBuilder {
             this._target = value;
 
 
@@ -1648,7 +1648,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
          * Sets time scale.
          *
          * @param value Time scale.
-         * 
+         *
          * @return Builder.
          */
         public setTimeScale(value: number): PhysicsRigBuilder {
@@ -1660,9 +1660,9 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Sets physics JSON to deserialize.
-         * 
+         *
          * @param value Physics JSON object.
-         * 
+         *
          * @return Builder.
          */
         public setPhysics3Json(value: any): PhysicsRigBuilder {
@@ -1675,7 +1675,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /**
          * Executes build.
-         * 
+         *
          * @return [[PhysicsRig]].
          */
         public build(): PhysicsRig {
@@ -1687,7 +1687,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
 
         /** Target. */
-        private _target: LIVE2DCUBISMCORE.Model;
+        private _target: Live2DCubismCore.Model;
 
         /** Time scale. */
         private _timeScale: number = 1;

@@ -6,15 +6,22 @@
     "pixi.js": "^4.5.2"
   },
   "scripts": {
-    "build": "tsc -p ./src"
+    "build": "tsc -p ./src",
+    "lint": "eslint --fix --ext .js,.ts --ignore-path .gitignore ."
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/Live2D/CubismJsComponents.git"
   },
-  "author": "Live2D Inc.",
+  "author": "naotaro0123",
   "license": "SEE LICENSE IN http://live2d.com/eula/live2d-open-software-license-agreement_en.html.",
   "devDependencies": {
-    "@types/pixi.js": "^4.5.2"
+    "@types/pixi.js": "^4.5.2",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.2.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "prettier": "^1.17.0",
+    "typescript": "^3.4.5"
   }
 }
