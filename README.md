@@ -5,7 +5,7 @@
 https://github.com/naotaro0123/Cubism3-WebGLCustom/tree/master/example/src
 
 ## DEMO  
-https://naotaro0123.github.io/Cubism3-WebGLCustom/tree/master/example/wwwroot/
+https://naotaro0123.github.io/Cubism3-WebGLCustom/example/wwwroot/
 
 
 ## Build Setup
